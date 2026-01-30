@@ -1,10 +1,10 @@
-# UML Documentation – Automated Log Analysis & Incident Management System (ALARS)
+# UML Documentation – Automated Log Analysis & Incident Response System (ALARS)
 
 ---
 
 ## 1. Overview
 
-This document explains the UML Use Case diagrams for the **Automated Log Analysis & Incident Management System (ALARS)**.
+This document explains the UML Use Case diagrams for the **Automated Log Analysis & Incident Response System (ALARS)**.
 
 These diagrams represent:
 - System actors
