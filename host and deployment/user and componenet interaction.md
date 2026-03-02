@@ -1,62 +1,93 @@
-🔹 1️⃣ How End Users Access ALARS
+## 2️⃣ User and Component Interaction – ALARS
 
-👤 Actors:
-	•	Admin
-	•	Analyst
-	•	User (Viewer)
+---
 
-⸻
+## 🔹 1️⃣ How End Users Access ALARS
 
-🔹 System Access Flow (Step-by-step)
+### 👤 Actors
 
-Step 1: User Access
-	•	Admin / Analyst opens web application in browser.
-	•	They log in using credentials.
-	•	Request is sent to Auth Service.
+- **Admin**
+- **Analyst**
+- **Viewer (User)**
 
-⸻
+---
 
-Step 2: Authentication
-	•	Auth Service validates user.
-	•	If valid → access granted.
-	•	Role determines permissions:
-	•	Admin → manage incidents, reports, rules
-	•	Analyst → analyze incidents
+## 🔹 System Access Flow (Step-by-Step)
 
-⸻
+### 🔸 Step 1: User Access
 
-Step 3: Log Flow (System Backend)
-	1.	Log Source sends logs to:
-→ Log Ingestion
-	2.	Logs move to:
-→ Log Processing
-(Parsing & Normalization)
-	3.	Logs move to:
-→ Analysis Service
-(Rule matching & classification)
-	4.	If suspicious:
-→ Incident Detection
+- Admin / Analyst / Viewer opens the web application in a browser.
+- User enters login credentials.
+- Login request is sent to **Auth Service**.
 
-⸻
+---
 
-Step 4: Incident Handling
-	•	Incident Detection sends data to:
-→ Incident Management
+### 🔸 Step 2: Authentication & Authorization
 
-Incident Management:
-	•	Stores incident
-	•	Allows Admin/Analyst to view/update
-	•	Triggers:
-✔ Notification Service (if critical)
-✔ Reporting Service
+- Auth Service validates user credentials.
+- If authentication is successful → access is granted.
+- Role-based permissions are applied:
 
-⸻
+  - **Admin**
+    - Manage incidents
+    - Manage rules
+    - View and generate reports
 
-Step 5: Reporting & Notifications
-	•	Notification Service sends alerts.
-	•	Reporting Service generates reports.
-	•	Admin/Analyst view reports via UI.
+  - **Analyst**
+    - Analyze incidents
+    - Update incident status
+    - View reports
 
-2️⃣ Pictorial Representation
+  - **Viewer**
+    - View reports only
+
+---
+
+### 🔸 Step 3: Log Processing Flow (Backend)
+
+1. **Log Source** sends logs to:
+   → **Log Ingestion**
+
+2. Logs move to:
+   → **Log Processing**  
+   (Parsing & Normalization)
+
+3. Processed logs move to:
+   → **Analysis Service**  
+   (Rule matching & risk classification)
+
+4. If suspicious activity is detected:
+   → **Incident Detection**
+
+---
+
+### 🔸 Step 4: Incident Handling
+
+- Incident Detection forwards confirmed incidents to:
+  → **Incident Management**
+
+Incident Management performs:
+
+- Incident storage
+- Status tracking (Open → Acknowledged → Resolved)
+- Allows Admin/Analyst to update incidents
+- Triggers:
+
+  - ✔ **Notification Service** (for critical incidents)
+  - ✔ **Reporting Service**
+
+---
+
+### 🔸 Step 5: Reporting & Notifications
+
+- **Notification Service** sends alerts to relevant stakeholders.
+- **Reporting Service** generates incident reports.
+- Admin / Analyst / Viewer access reports via the dashboard UI.
+
+---
+
+## 2️⃣ Pictorial Representation
 
 ![User and Component Interaction](interaction.png)
+
+---

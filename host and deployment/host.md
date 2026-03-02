@@ -1,24 +1,49 @@
-For ALARS – Automated Log Analysis & Incident Management System, the components will be hosted as follows:
+## 1️⃣ Hosting Plan – ALARS
 
-🔹 Backend (Node.js – LogAnalyzer, AuthService, AlertManager)
-	•	Host: AWS EC2 (Ubuntu Server)
-	•	Alternative: Render / Railway / Azure VM
-	•	Runtime: Node.js (LTS)
+For **ALARS – Automated Log Analysis & Incident Management System**, the application components will be hosted as follows:
 
-🔹 Database
-	•	Host: AWS RDS (MySQL / PostgreSQL)
-	•	Stores:
-	•	Logs
-	•	Incidents
-	•	Alerts
-	•	Users
-	•	Reports
+---
 
-🔹 Frontend (if applicable)
-	•	Host: Netlify / Vercel
-	•	Built using HTML/CSS/JS (or React if used)
+### 🔹 Backend Services
 
-🔹 Notification Service
-	•	Email via SendGrid / SMTP
-	•	Or console-based internal notification service
-    
+**Technology:** Node.js  
+**Modules:** LogAnalyzer, AuthService, AlertManager  
+
+- **Primary Host:** AWS EC2 (Ubuntu Server)
+- **Alternative Hosting Options:**
+  - Render
+  - Railway
+  - Azure Virtual Machine
+- **Runtime Environment:** Node.js (LTS Version)
+
+---
+
+### 🔹 Database Layer
+
+- **Host:** AWS RDS (MySQL / PostgreSQL)
+- **Purpose:** Stores persistent system data
+
+**Database Tables Include:**
+- Logs
+- Incidents
+- Alerts
+- Users
+- Reports
+
+---
+
+### 🔹 Frontend Layer (If Applicable)
+
+- **Host:** Netlify / Vercel
+- **Built Using:** HTML, CSS, JavaScript (or React if implemented)
+- **Purpose:** Provides web-based interface for Admin, Analyst, and Viewer
+
+---
+
+### 🔹 Notification Service
+
+- **Email Integration:** SendGrid / SMTP
+- **Alternative:** Console-based internal notification system
+- **Purpose:** Sends alerts for critical incidents
+
+---
