@@ -32,7 +32,7 @@ For **ALARS – Automated Log Analysis & Incident Management System**, the appli
 
 ---
 
-### 🔹 Frontend Layer (If Applicable)
+### 🔹 Frontend Layer
 
 - **Host:** Netlify / Vercel
 - **Built Using:** HTML, CSS, JavaScript (or React if implemented)
