@@ -1,87 +1,104 @@
 import React from 'react';
 
-const RISK_STYLE = {
-  CRITICAL: { bg: '#ffebee', text: '#c62828' },
-  HIGH:     { bg: '#fff3e0', text: '#e65100' },
-  MEDIUM:   { bg: '#fffde7', text: '#f57f17' },
-  LOW:      { bg: '#e8f5e9', text: '#2e7d32' },
-  INFO:     { bg: '#e3f2fd', text: '#1565c0' },
-};
+const FILTERS = ['ALL', 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
 
-function Badge({ label, bg, text }) {
-  return (
-    <span style={{
-      backgroundColor: bg, color: text,
-      padding: '3px 10px', borderRadius: '12px',
-      fontWeight: 'bold', fontSize: '12px', whiteSpace: 'nowrap',
-    }}>
-      {label}
-    </span>
-  );
+function formatTimestamp(value) {
+  if (!value) {
+    return 'Not available';
+  }
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return 'Not available';
+  }
+
+  return parsed.toLocaleString();
 }
 
-function IncidentTable({ incidents }) {
+function toTitleCase(value) {
+  return String(value || '').replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function IncidentTable({
+  incidents,
+  totalCount,
+  countsBySeverity,
+  severityFilter,
+  onSeverityChange,
+  searchValue,
+  onSearchChange,
+}) {
   return (
-    <div style={card}>
-      <h2 style={heading}>
-        Detected Incidents
-        {incidents.length > 0 && (
-          <span style={{ marginLeft: '10px', fontSize: '14px', fontWeight: 'normal', color: '#555' }}>
-            ({incidents.length} total)
-          </span>
-        )}
-      </h2>
+    <section className="surface">
+      <div className="surface__header">
+        <h2 className="surface__title">Incident queue</h2>
+        <div className="surface__toolbar">
+          <span className="surface__meta">{incidents.length} of {totalCount}</span>
+          <select
+            className="select-input select-input--compact"
+            value={severityFilter}
+            onChange={(event) => onSeverityChange(event.target.value)}
+          >
+            {FILTERS.map((filter) => (
+              <option key={filter} value={filter}>
+                {filter}
+                {filter === 'ALL' ? ` (${totalCount})` : ` (${countsBySeverity[filter] || 0})`}
+              </option>
+            ))}
+          </select>
+          <input
+            className="text-input text-input--compact"
+            type="search"
+            value={searchValue}
+            onChange={(event) => onSearchChange(event.target.value)}
+            placeholder="Search incidents"
+          />
+        </div>
+      </div>
 
       {incidents.length === 0 ? (
-        <p style={{ color: '#777', marginTop: '8px' }}>
-          No incidents yet. Submit a log containing <strong>ERROR</strong>, <strong>FAIL</strong>, or <strong>CRITICAL</strong> to trigger one.
-        </p>
+        <div className="empty-state">
+          <strong>No incidents found.</strong>
+          <p>Change the filter or submit a new risky log.</p>
+        </div>
       ) : (
-        <div style={{ overflowX: 'auto' }}>
-          <table style={table}>
+        <div className="table-wrap">
+          <table className="data-table">
             <thead>
-              <tr style={{ backgroundColor: '#1a237e', color: 'white' }}>
-                {['ID', 'Log Message', 'Source', 'Risk Level', 'Status', 'Detected At'].map(h => (
-                  <th key={h} style={th}>{h}</th>
-                ))}
+              <tr>
+                <th>ID</th>
+                <th>Message</th>
+                <th>Source</th>
+                <th>Risk</th>
+                <th>Status</th>
+                <th>Detected at</th>
               </tr>
             </thead>
             <tbody>
-              {incidents.map((inc, idx) => {
-                const style = RISK_STYLE[inc.risk_level] || RISK_STYLE.INFO;
-                return (
-                  <tr key={inc.id} style={{ backgroundColor: idx % 2 === 0 ? 'white' : '#fafafa' }}>
-                    <td style={td}>{inc.id}</td>
-                    <td style={{ ...td, maxWidth: '260px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                        title={inc.log_message}>
-                      {inc.log_message}
-                    </td>
-                    <td style={td}>{inc.source}</td>
-                    <td style={td}>
-                      <Badge label={inc.risk_level} bg={style.bg} text={style.text} />
-                    </td>
-                    <td style={td}>
-                      <Badge label={inc.status} bg="#e0f2f1" text="#00695c" />
-                    </td>
-                    <td style={{ ...td, whiteSpace: 'nowrap', fontSize: '12px', color: '#555' }}>
-                      {new Date(inc.created_at).toLocaleString()}
-                    </td>
-                  </tr>
-                );
-              })}
+              {incidents.map((incident) => (
+                <tr key={incident.id}>
+                  <td>{incident.id}</td>
+                  <td className="data-table__message-cell">{incident.log_message}</td>
+                  <td>{incident.source}</td>
+                  <td>
+                    <span className={`badge badge--${incident.risk_level.toLowerCase()}`}>
+                      {incident.risk_level}
+                    </span>
+                  </td>
+                  <td>
+                    <span className="badge badge--status">
+                      {toTitleCase(incident.status)}
+                    </span>
+                  </td>
+                  <td>{formatTimestamp(incident.created_at)}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
       )}
-    </div>
+    </section>
   );
 }
-
-// ── Styles ──────────────────────────────────────────────────────────────────
-const card    = { backgroundColor: 'white', padding: '22px', borderRadius: '8px', boxShadow: '0 2px 6px rgba(0,0,0,0.1)' };
-const heading = { marginTop: 0, color: '#1a237e', fontSize: '18px' };
-const table   = { width: '100%', borderCollapse: 'collapse', fontSize: '14px' };
-const th      = { padding: '10px 14px', textAlign: 'left', fontWeight: '600', whiteSpace: 'nowrap' };
-const td      = { padding: '10px 14px', borderBottom: '1px solid #eee' };
 
 export default IncidentTable;
