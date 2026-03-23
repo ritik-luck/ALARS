@@ -12,7 +12,7 @@ exports.register = async (req, res) => {
     const existing = await userModel.findByUsername(username);
     if (existing) return res.status(409).json({ error: 'User already exists' });
 
-    // NOTE: storing plaintext passwords is insecure; doing this per user request.
+    
     const user = await userModel.createUser({ username, password, role });
     res.status(201).json({ id: user.id, username: user.username, role: user.role });
   } catch (err) {
@@ -29,7 +29,7 @@ exports.login = async (req, res) => {
     const user = await userModel.findByUsername(username);
     if (!user) return res.status(401).json({ error: 'Invalid credentials' });
 
-    // Plaintext comparison (insecure): compare directly
+    
     if (password !== user.password) return res.status(401).json({ error: 'Invalid credentials' });
 
     const payload = { id: user.id, username: user.username, role: user.role };
