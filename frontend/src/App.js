@@ -1,7 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Dashboard from './components/Dashboard';
+import Login from './components/Login';
+import { getToken, clearToken } from './auth';
 
 function App() {
+  const [authenticated, setAuthenticated] = useState(false);
+
+  useEffect(() => {
+    setAuthenticated(!!getToken());
+  }, []);
+
+  const handleLogin = () => setAuthenticated(true);
+  const handleLogout = () => {
+    clearToken();
+    setAuthenticated(false);
+  };
+
   return (
     <div className="app-shell">
       <header className="app-header">
@@ -16,7 +30,16 @@ function App() {
       </header>
 
       <main className="app-main">
-        <Dashboard />
+        {authenticated ? (
+          <>
+            <div style={{ textAlign: 'right', marginBottom: 8 }}>
+              <button className="button-ghost" onClick={handleLogout}>Sign out</button>
+            </div>
+            <Dashboard />
+          </>
+        ) : (
+          <Login onLogin={handleLogin} />
+        )}
       </main>
     </div>
   );

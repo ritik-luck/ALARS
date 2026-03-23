@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { submitLog } from '../api';
 
+const API_TARGET = process.env.REACT_APP_API_BASE || 'http://127.0.0.1:5000/api';
+
 const SAMPLE_SCENARIOS = [
   {
     id: '',
@@ -87,7 +89,7 @@ function LogUpload({ onLogSubmitted }) {
     } catch (submissionError) {
       setError(
         submissionError.response?.data?.error ||
-          'Could not reach the backend. Make sure the Node.js server is running on port 5000.'
+          `Could not reach the backend at ${API_TARGET}. Make sure the Node.js server is running.`
       );
     } finally {
       setLoading(false);
