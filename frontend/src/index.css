@@ -399,6 +399,90 @@ button {
   border-collapse: collapse;
 }
 
+/* --- Login advanced styles --- */
+.login-viewport {
+  display: grid;
+  grid-template-columns: 520px 1fr;
+  gap: 28px;
+  align-items: center;
+  min-height: 520px;
+  margin-top: 26px;
+}
+
+.login-card {
+  padding: 28px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(20,30,25,0.98), rgba(12,18,15,0.95));
+  border: 1px solid rgba(255,255,255,0.03);
+  box-shadow: 0 20px 40px rgba(2,8,4,0.6);
+}
+
+.login-brand {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.logo-mark {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  color: #031008;
+  background: linear-gradient(180deg,#34d17b,#22b566);
+  box-shadow: 0 8px 20px rgba(52,209,123,0.12), inset 0 -6px 18px rgba(0,0,0,0.18);
+}
+
+.brand-title {
+  font-weight: 900;
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+}
+
+.brand-sub {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.login-form-advanced {
+  display: grid;
+  gap: 12px;
+}
+
+.login-heading {
+  margin: 4px 0 8px;
+  font-size: 1.3rem;
+}
+
+.login-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 380px;
+  border-radius: 18px;
+  padding: 20px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.02);
+}
+
+.login-hint {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+  .login-viewport {
+    grid-template-columns: 1fr;
+    padding: 18px 0;
+  }
+  .login-visual { display: none; }
+}
+
 .data-table th,
 .data-table td {
   padding: 14px 16px;
