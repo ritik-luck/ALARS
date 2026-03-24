@@ -20,6 +20,7 @@ app.use('/api/incidents', incidentRoutes);
 app.use('/api/auth', authRoutes);
 
 // Health check
+//checking
 app.get('/', (req, res) => {
   res.json({ message: 'ALARS API is running', version: '1.0.0' });
 });
