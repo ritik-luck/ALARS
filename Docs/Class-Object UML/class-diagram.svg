@@ -1,0 +1,275 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1420 1780" role="img" aria-labelledby="title desc" shape-rendering="geometricPrecision" text-rendering="geometricPrecision">
+  <title id="title">ALARS Class Diagram</title>
+  <desc id="desc">Class diagram for the Automated Log Analysis and Incident Response System showing log processing, incident management, alerting, reporting, authentication, and user roles.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 12 12" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,1 L11,6 L1,11 Z" fill="#111827" stroke="#111827" stroke-width="1"/>
+    </marker>
+    <style>
+      .box { fill: #b7d7ea; stroke: #333; stroke-width: 1.5; }
+      .split { stroke: #333; stroke-width: 1.2; }
+      .badge { fill: #d7e4c7; stroke: #333; stroke-width: 1.1; }
+      .title { font-family: Arial, sans-serif; font-size: 14px; font-weight: 700; fill: #111; }
+      .text { font-family: Arial, sans-serif; font-size: 12px; fill: #111; }
+      .edge { fill: none; stroke: #111827; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow); }
+      .inherit { fill: none; stroke: #111827; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+      .hollow-arrow { fill: #ffffff; stroke: #111827; stroke-width: 1.8; stroke-linejoin: round; }
+      .edge-label { font-family: Arial, sans-serif; font-size: 11px; fill: #111; paint-order: stroke fill; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1420" height="1780" fill="#ffffff"/>
+
+  <path class="edge" d="M340 168 L340 250"/>
+  <text class="edge-label" x="327" y="200">1</text>
+  <text class="edge-label" x="327" y="242">1</text>
+  <text class="edge-label" x="348" y="220">parsed by</text>
+
+  <path class="edge" d="M340 330 L340 380"/>
+  <text class="edge-label" x="354" y="356">sends data to</text>
+
+  <path class="edge" d="M340 472 L340 560"/>
+  <text class="edge-label" x="354" y="522">provides data to</text>
+
+  <path class="edge" d="M350 652 L440 760"/>
+  <text class="edge-label" x="376" y="704">triggers</text>
+
+  <path class="edge" d="M602 670 L500 760"/>
+  <text class="edge-label" x="535" y="704">applied by</text>
+
+  <path class="edge" d="M455 852 L455 960"/>
+  <text class="edge-label" x="470" y="910">creates</text>
+
+  <path class="edge" d="M365 1082 L246 1260"/>
+  <text class="edge-label" x="230" y="1180">triggers alert</text>
+
+  <path class="edge" d="M455 1150 L430 1260"/>
+  <text class="edge-label" x="442" y="1194">requests report</text>
+
+  <path class="edge" d="M525 1150 L516 1450"/>
+  <text class="edge-label" x="530" y="1306">includes</text>
+
+  <path class="edge" d="M585 1062 L640 1120"/>
+  <text class="edge-label" x="615" y="1090">records</text>
+
+  <path class="edge" d="M180 1350 L180 1450"/>
+  <text class="edge-label" x="165" y="1392">1</text>
+  <text class="edge-label" x="165" y="1440">1..*</text>
+  <text class="edge-label" x="192" y="1408">manages</text>
+
+  <path class="edge" d="M430 1350 L480 1450"/>
+  <text class="edge-label" x="452" y="1403">produces</text>
+
+  <path class="edge" d="M280 1520 L280 1660"/>
+  <text class="edge-label" x="214" y="1588">sends notification</text>
+
+  <path class="edge" d="M944 1260 C892 1322 784 1402 560 1450"/>
+  <text class="edge-label" x="760" y="1330">views</text>
+
+  <path class="edge" d="M1005 1260 L1005 1450"/>
+  <text class="edge-label" x="1005" y="1366">authenticates via</text>
+
+  <path class="inherit" d="M856 1450 C872 1392 904 1336 932 1274"/>
+  <polygon class="hollow-arrow" points="940,1260 938,1277 926,1270"/>
+  <text class="edge-label" x="842" y="1366">is a</text>
+
+  <path class="inherit" d="M1156 1450 C1130 1392 1092 1336 986 1268"/>
+  <polygon class="hollow-arrow" points="972,1260 989,1262 982,1274"/>
+  <text class="edge-label" x="1104" y="1366">is a</text>
+
+  <path class="inherit" d="M1306 1450 C1256 1390 1200 1336 1086 1268"/>
+  <polygon class="hollow-arrow" points="1072,1260 1089,1262 1082,1274"/>
+  <text class="edge-label" x="1228" y="1366">is a</text>
+
+  <g transform="translate(220 20)">
+    <rect class="box" width="240" height="148"/>
+    <line class="split" x1="0" y1="36" x2="240" y2="36"/>
+    <line class="split" x1="0" y1="124" x2="240" y2="124"/>
+    <circle class="badge" cx="24" cy="18" r="12"/>
+    <text class="title" x="20" y="22">C</text>
+    <text class="title" x="44" y="23">Log</text>
+    <text class="text" x="16" y="58">logID : String</text>
+    <text class="text" x="16" y="76">timestamp : DateTime</text>
+    <text class="text" x="16" y="94">source : String</text>
+    <text class="text" x="16" y="112">message : String</text>
+    <text class="text" x="16" y="142">getDetails()</text>
+  </g>
+
+  <g transform="translate(254 250)">
+    <rect class="box" width="170" height="80"/>
+    <line class="split" x1="0" y1="36" x2="170" y2="36"/>
+    <circle class="badge" cx="20" cy="18" r="11"/>
+    <text class="title" x="16" y="22">C</text>
+    <text class="title" x="38" y="23">LogParser</text>
+    <text class="text" x="16" y="62">parseLog()</text>
+  </g>
+
+  <g transform="translate(245 380)">
+    <rect class="box" width="190" height="92"/>
+    <line class="split" x1="0" y1="36" x2="190" y2="36"/>
+    <circle class="badge" cx="20" cy="18" r="11"/>
+    <text class="title" x="16" y="22">C</text>
+    <text class="title" x="38" y="23">LogNormalizer</text>
+    <text class="text" x="16" y="64">normalize()</text>
+  </g>
+
+  <g transform="translate(245 560)">
+    <rect class="box" width="190" height="92"/>
+    <line class="split" x1="0" y1="36" x2="190" y2="36"/>
+    <circle class="badge" cx="20" cy="18" r="11"/>
+    <text class="title" x="16" y="22">C</text>
+    <text class="title" x="38" y="23">LogAnalyzer</text>
+    <text class="text" x="16" y="64">analyze()</text>
+  </g>
+
+  <g transform="translate(530 540)">
+    <rect class="box" width="210" height="130"/>
+    <line class="split" x1="0" y1="36" x2="210" y2="36"/>
+    <line class="split" x1="0" y1="104" x2="210" y2="104"/>
+    <circle class="badge" cx="20" cy="18" r="11"/>
+    <text class="title" x="16" y="22">C</text>
+    <text class="title" x="38" y="23">Rule</text>
+    <text class="text" x="16" y="58">ruleID : String</text>
+    <text class="text" x="16" y="76">condition : String</text>
+    <text class="text" x="16" y="94">riskLevel : String</text>
+    <text class="text" x="16" y="122">evaluate()</text>
+  </g>
+
+  <g transform="translate(330 760)">
+    <rect class="box" width="250" height="92"/>
+    <line class="split" x1="0" y1="36" x2="250" y2="36"/>
+    <circle class="badge" cx="20" cy="18" r="11"/>
+    <text class="title" x="16" y="22">C</text>
+    <text class="title" x="38" y="23">IncidentManager</text>
+    <text class="text" x="16" y="64">createIncident()</text>
+  </g>
+
+  <g transform="translate(345 960)">
+    <rect class="box" width="240" height="190"/>
+    <line class="split" x1="0" y1="36" x2="240" y2="36"/>
+    <line class="split" x1="0" y1="138" x2="240" y2="138"/>
+    <circle class="badge" cx="20" cy="18" r="11"/>
+    <text class="title" x="16" y="22">C</text>
+    <text class="title" x="38" y="23">Incident</text>
+    <text class="text" x="16" y="58">incidentID : String</text>
+    <text class="text" x="16" y="80">severity : String</text>
+    <text class="text" x="16" y="102">status : String</text>
+    <text class="text" x="16" y="124">description : String</text>
+    <text class="text" x="16" y="162">updateStatus()</text>
+  </g>
+
+  <g transform="translate(80 1260)">
+    <rect class="box" width="200" height="90"/>
+    <line class="split" x1="0" y1="36" x2="200" y2="36"/>
+    <circle class="badge" cx="20" cy="18" r="11"/>
+    <text class="title" x="16" y="22">C</text>
+    <text class="title" x="38" y="23">AlertManager</text>
+    <text class="text" x="16" y="64">generateAlert()</text>
+  </g>
+
+  <g transform="translate(330 1260)">
+    <rect class="box" width="200" height="90"/>
+    <line class="split" x1="0" y1="36" x2="200" y2="36"/>
+    <circle class="badge" cx="20" cy="18" r="11"/>
+    <text class="title" x="16" y="22">C</text>
+    <text class="title" x="38" y="23">ReportService</text>
+    <text class="text" x="16" y="64">generateReport()</text>
+  </g>
+
+  <g transform="translate(640 1120)">
+    <rect class="box" width="200" height="130"/>
+    <line class="split" x1="0" y1="36" x2="200" y2="36"/>
+    <line class="split" x1="0" y1="94" x2="200" y2="94"/>
+    <circle class="badge" cx="20" cy="18" r="11"/>
+    <text class="title" x="16" y="22">C</text>
+    <text class="title" x="38" y="23">AuditLog</text>
+    <text class="text" x="16" y="58">auditID : String</text>
+    <text class="text" x="16" y="80">action : String</text>
+    <text class="text" x="16" y="116">record()</text>
+  </g>
+
+  <g transform="translate(900 1100)">
+    <rect class="box" width="210" height="160"/>
+    <line class="split" x1="0" y1="36" x2="210" y2="36"/>
+    <line class="split" x1="0" y1="108" x2="210" y2="108"/>
+    <circle class="badge" cx="20" cy="18" r="11"/>
+    <text class="title" x="16" y="22">C</text>
+    <text class="title" x="38" y="23">User</text>
+    <text class="text" x="16" y="58">userID : String</text>
+    <text class="text" x="16" y="78">name : String</text>
+    <text class="text" x="16" y="98">role : String</text>
+    <text class="text" x="16" y="130">login()</text>
+    <text class="text" x="16" y="148">viewReport()</text>
+  </g>
+
+  <g transform="translate(48 1450)">
+    <rect class="box" width="236" height="140"/>
+    <line class="split" x1="0" y1="36" x2="236" y2="36"/>
+    <line class="split" x1="0" y1="106" x2="236" y2="106"/>
+    <circle class="badge" cx="20" cy="18" r="11"/>
+    <text class="title" x="16" y="22">C</text>
+    <text class="title" x="38" y="23">Alert</text>
+    <text class="text" x="16" y="58">alertID : String</text>
+    <text class="text" x="16" y="78">type : String</text>
+    <text class="text" x="16" y="98">timeGenerated : DateTime</text>
+    <text class="text" x="16" y="128">sendAlert()</text>
+  </g>
+
+  <g transform="translate(356 1450)">
+    <rect class="box" width="250" height="150"/>
+    <line class="split" x1="0" y1="36" x2="250" y2="36"/>
+    <line class="split" x1="0" y1="108" x2="250" y2="108"/>
+    <circle class="badge" cx="20" cy="18" r="11"/>
+    <text class="title" x="16" y="22">C</text>
+    <text class="title" x="38" y="23">Report</text>
+    <text class="text" x="16" y="58">reportID : String</text>
+    <text class="text" x="16" y="78">generatedDate : DateTime</text>
+    <text class="text" x="16" y="98">content : String</text>
+    <text class="text" x="16" y="132">generate()</text>
+  </g>
+
+  <g transform="translate(60 1660)">
+    <rect class="box" width="240" height="86"/>
+    <line class="split" x1="0" y1="36" x2="240" y2="36"/>
+    <circle class="badge" cx="20" cy="18" r="11"/>
+    <text class="title" x="16" y="22">C</text>
+    <text class="title" x="38" y="23">NotificationService</text>
+    <text class="text" x="16" y="62">notify()</text>
+  </g>
+
+  <g transform="translate(796 1450)">
+    <rect class="box" width="120" height="86"/>
+    <line class="split" x1="0" y1="36" x2="120" y2="36"/>
+    <circle class="badge" cx="20" cy="18" r="11"/>
+    <text class="title" x="16" y="22">C</text>
+    <text class="title" x="38" y="23">Viewer</text>
+    <text class="text" x="16" y="62">viewReport()</text>
+  </g>
+
+  <g transform="translate(935 1450)">
+    <rect class="box" width="140" height="86"/>
+    <line class="split" x1="0" y1="36" x2="140" y2="36"/>
+    <circle class="badge" cx="20" cy="18" r="11"/>
+    <text class="title" x="16" y="22">C</text>
+    <text class="title" x="38" y="23">AuthService</text>
+    <text class="text" x="16" y="62">authenticate()</text>
+  </g>
+
+  <g transform="translate(1096 1450)">
+    <rect class="box" width="120" height="86"/>
+    <line class="split" x1="0" y1="36" x2="120" y2="36"/>
+    <circle class="badge" cx="20" cy="18" r="11"/>
+    <text class="title" x="16" y="22">C</text>
+    <text class="title" x="38" y="23">Admin</text>
+    <text class="text" x="16" y="62">manageRules()</text>
+  </g>
+
+  <g transform="translate(1236 1450)">
+    <rect class="box" width="140" height="86"/>
+    <line class="split" x1="0" y1="36" x2="140" y2="36"/>
+    <circle class="badge" cx="20" cy="18" r="11"/>
+    <text class="title" x="16" y="22">C</text>
+    <text class="title" x="38" y="23">Analyst</text>
+    <text class="text" x="16" y="62">analyzeIncidents()</text>
+  </g>
+</svg>

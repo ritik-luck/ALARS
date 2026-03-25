@@ -1,0 +1,185 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 1760" role="img" aria-labelledby="title desc" shape-rendering="geometricPrecision" text-rendering="geometricPrecision">
+  <title id="title">ALARS Level 1 Data Flow Diagram</title>
+  <desc id="desc">Level 1 data flow diagram for ALARS covering log ingestion, parsing, analysis, incident detection, risk classification, alerts, reporting, users, authentication, and rules management.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 12 12" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,1 L11,6 L1,11 Z" fill="#111827" stroke="#111827" stroke-width="1"/>
+    </marker>
+    <style>
+      .process { fill: #b7d7ea; stroke: #333; stroke-width: 1.5; }
+      .entity { fill: #b7d7ea; stroke: #333; stroke-width: 1.5; }
+      .store-body { fill: #d9d9d9; stroke: #666; stroke-width: 1.4; }
+      .store-top { fill: #eeeeee; stroke: #666; stroke-width: 1.4; }
+      .edge { fill: none; stroke: #111827; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow); }
+      .box-title { font-family: Arial, sans-serif; font-size: 15px; font-weight: 700; fill: #111; text-anchor: middle; dominant-baseline: middle; }
+      .flow-label { font-family: Arial, sans-serif; font-size: 12px; fill: #111; text-anchor: middle; paint-order: stroke fill; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1100" height="1760" fill="#ffffff"/>
+
+  <rect class="entity" x="425" y="20" width="250" height="48" rx="3"/>
+  <text class="box-title" x="550" y="44">Log Source / Agent</text>
+
+  <rect class="process" x="460" y="118" width="180" height="56" rx="3"/>
+  <text class="box-title" x="550" y="146">1.0 Ingest Logs</text>
+
+  <g transform="translate(500 238)">
+    <ellipse class="store-top" cx="50" cy="12" rx="50" ry="12"/>
+    <rect class="store-body" x="0" y="12" width="100" height="36"/>
+    <ellipse class="store-top" cx="50" cy="48" rx="50" ry="12"/>
+    <text class="box-title" x="50" y="33">Raw Log DB</text>
+  </g>
+
+  <rect class="process" x="435" y="336" width="230" height="56" rx="3"/>
+  <text class="box-title" x="550" y="364">2.0 Parse &amp; Normalize</text>
+
+  <g transform="translate(465 450)">
+    <ellipse class="store-top" cx="85" cy="14" rx="85" ry="14"/>
+    <rect class="store-body" x="0" y="14" width="170" height="44"/>
+    <ellipse class="store-top" cx="85" cy="58" rx="85" ry="14"/>
+    <text class="box-title" x="85" y="38">Normalized Logs DB</text>
+  </g>
+
+  <rect class="process" x="365" y="612" width="180" height="56" rx="3"/>
+  <text class="box-title" x="455" y="640">3.0 Analyze Logs</text>
+
+  <rect class="process" x="350" y="730" width="210" height="56" rx="3"/>
+  <text class="box-title" x="455" y="758">4.0 Detect Incidents</text>
+
+  <g transform="translate(430 860)">
+    <ellipse class="store-top" cx="70" cy="14" rx="70" ry="14"/>
+    <rect class="store-body" x="0" y="14" width="140" height="42"/>
+    <ellipse class="store-top" cx="70" cy="56" rx="70" ry="14"/>
+    <text class="box-title" x="70" y="38">Incident DB</text>
+  </g>
+
+  <rect class="process" x="395" y="990" width="300" height="60" rx="3"/>
+  <text class="box-title" x="545" y="1020">9.0 Reporting &amp; Search</text>
+
+  <rect class="entity" x="210" y="1088" width="110" height="48" rx="3"/>
+  <text class="box-title" x="265" y="1112">Analyst</text>
+
+  <rect class="entity" x="430" y="1088" width="110" height="48" rx="3"/>
+  <text class="box-title" x="485" y="1112">Viewer</text>
+
+  <rect class="entity" x="660" y="1088" width="110" height="48" rx="3"/>
+  <text class="box-title" x="715" y="1112">Admin</text>
+
+  <g transform="translate(860 1062)">
+    <ellipse class="store-top" cx="80" cy="14" rx="80" ry="14"/>
+    <rect class="store-body" x="0" y="14" width="160" height="44"/>
+    <ellipse class="store-top" cx="80" cy="58" rx="80" ry="14"/>
+    <text class="box-title" x="80" y="38">Reports DB</text>
+  </g>
+
+  <rect class="process" x="290" y="1228" width="310" height="60" rx="3"/>
+  <text class="box-title" x="445" y="1258">7.0 Manage Users &amp; Auth</text>
+
+  <g transform="translate(215 1340)">
+    <ellipse class="store-top" cx="70" cy="14" rx="70" ry="14"/>
+    <rect class="store-body" x="0" y="14" width="140" height="42"/>
+    <ellipse class="store-top" cx="70" cy="56" rx="70" ry="14"/>
+    <text class="box-title" x="70" y="38">User DB</text>
+  </g>
+
+  <rect class="entity" x="480" y="1340" width="150" height="48" rx="3"/>
+  <text class="box-title" x="555" y="1364">Auth Service</text>
+
+  <rect class="process" x="650" y="1228" width="230" height="60" rx="3"/>
+  <text class="box-title" x="765" y="1258">8.0 Manage Rules</text>
+
+  <g transform="translate(700 1340)">
+    <ellipse class="store-top" cx="70" cy="14" rx="70" ry="14"/>
+    <rect class="store-body" x="0" y="14" width="140" height="42"/>
+    <ellipse class="store-top" cx="70" cy="56" rx="70" ry="14"/>
+    <text class="box-title" x="70" y="38">Rules DB</text>
+  </g>
+
+  <rect class="process" x="120" y="1428" width="220" height="60" rx="3"/>
+  <text class="box-title" x="230" y="1458">5.0 Classify Risk</text>
+
+  <rect class="process" x="130" y="1520" width="210" height="56" rx="3"/>
+  <text class="box-title" x="235" y="1548">6.0 Generate Alerts</text>
+
+  <rect class="entity" x="12" y="1650" width="210" height="50" rx="3"/>
+  <text class="box-title" x="117" y="1675">Notification Service</text>
+
+  <g transform="translate(250 1630)">
+    <ellipse class="store-top" cx="75" cy="14" rx="75" ry="14"/>
+    <rect class="store-body" x="0" y="14" width="150" height="42"/>
+    <ellipse class="store-top" cx="75" cy="56" rx="75" ry="14"/>
+    <text class="box-title" x="75" y="38">Audit Logs</text>
+  </g>
+
+  <path class="edge" d="M550 68 L550 118"/>
+  <text class="flow-label" x="605" y="96">Log Data</text>
+
+  <path class="edge" d="M550 174 L550 238"/>
+  <path class="edge" d="M550 294 L550 336"/>
+  <path class="edge" d="M550 392 L550 450"/>
+  <text class="flow-label" x="634" y="428">Normalized Logs</text>
+
+  <path class="edge" d="M512 522 L455 612"/>
+  <path class="edge" d="M455 668 L455 730"/>
+  <path class="edge" d="M455 786 L500 860"/>
+  <text class="flow-label" x="565" y="822">Store Incident</text>
+
+  <path class="edge" d="M500 930 L500 990"/>
+  <text class="flow-label" x="590" y="962">Incident Data</text>
+
+  <path class="edge" d="M635 520 C720 660 690 820 620 990"/>
+  <text class="flow-label" x="705" y="774">Log Data</text>
+
+  <path class="edge" d="M350 758 C180 820 92 936 92 1100 L92 1458 L120 1458"/>
+  <text class="flow-label" x="78" y="1116">Incident Stream</text>
+
+  <path class="edge" d="M230 1488 L235 1520"/>
+
+  <path class="edge" d="M170 1576 C136 1600 110 1622 92 1650"/>
+  <text class="flow-label" x="96" y="1608">Alert Notification</text>
+
+  <path class="edge" d="M265 1576 L315 1630"/>
+  <text class="flow-label" x="322" y="1600">Audit Logs</text>
+
+  <path class="edge" d="M700 1382 C600 1400 446 1415 340 1452"/>
+  <text class="flow-label" x="540" y="1404">Risk Rules</text>
+
+  <path class="edge" d="M715 1136 L715 1228"/>
+  <path class="edge" d="M715 1288 L770 1340"/>
+  <text class="flow-label" x="800" y="1312">Rules</text>
+
+  <path class="edge" d="M715 1136 L560 1228"/>
+  <path class="edge" d="M485 1136 L485 1228"/>
+  <path class="edge" d="M265 1136 L360 1228"/>
+
+  <path class="edge" d="M340 1288 C316 1308 288 1326 244 1348"/>
+  <text class="flow-label" x="270" y="1312">User Data</text>
+
+  <path class="edge" d="M326 1348 C360 1334 394 1314 430 1288"/>
+  <text class="flow-label" x="382" y="1330">Fetch User Data</text>
+
+  <path class="edge" d="M520 1288 L555 1340"/>
+  <text class="flow-label" x="610" y="1312">Authentication</text>
+
+  <path class="edge" d="M395 1030 C342 1040 300 1052 235 1088"/>
+  <text class="flow-label" x="302" y="1064">Filtered Results</text>
+
+  <path class="edge" d="M295 1088 C330 1058 360 1032 395 1010"/>
+  <text class="flow-label" x="326" y="1038">Search Query</text>
+
+  <path class="edge" d="M500 1088 C505 1074 512 1062 522 1050"/>
+  <text class="flow-label" x="565" y="1068">View Request</text>
+
+  <path class="edge" d="M470 1050 C465 1062 460 1074 455 1088"/>
+  <text class="flow-label" x="445" y="1068">Display Reports</text>
+
+  <path class="edge" d="M650 1050 C660 1062 674 1074 690 1088"/>
+  <text class="flow-label" x="694" y="1068">View Reports</text>
+
+  <path class="edge" d="M695 1016 C760 1026 818 1048 860 1076"/>
+  <text class="flow-label" x="805" y="1034">Store Reports</text>
+
+  <path class="edge" d="M860 1098 C818 1090 760 1074 695 1038"/>
+  <text class="flow-label" x="808" y="1088">Fetch Reports</text>
+</svg>
