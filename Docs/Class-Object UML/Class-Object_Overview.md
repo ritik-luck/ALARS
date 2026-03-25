@@ -1,118 +1,49 @@
+# Class and Object Diagram Overview - ALARS
 
+This document summarizes the class and object diagrams for the Automated Log Analysis and Incident Response System (ALARS). The diagrams in this folder are stored as SVG so they render directly in GitHub.
 
-# Class & Object Diagram Overview — ALARS (Automated Log Analysis & Incident Response System)
+## 1. Class Diagram
 
-This document provides an overview of the **Class Diagram** and **Object Diagram** for the ALARS (Automated Log Analysis & Incident Response System). These UML diagrams describe the static structure of the system and how its elements are organized and instantiated.
+The class diagram shows the static structure of ALARS and the main relationships between processing, incident management, reporting, and user-access components.
 
----
+### Main classes shown
 
-## 1. Purpose of UML Class & Object Diagrams
+- `Log`, `LogParser`, `LogNormalizer`, and `LogAnalyzer` model the log-processing pipeline.
+- `Rule` and `IncidentManager` drive incident creation.
+- `Incident`, `AlertManager`, `Alert`, `ReportService`, `Report`, and `AuditLog` capture the response workflow.
+- `User` is specialized into `Admin`, `Analyst`, and `Viewer`.
+- `AuthService` and `NotificationService` support authentication and alert delivery.
 
-UML Class and Object diagrams help to:
+### Main relationships shown
 
-- Model the static structure of the system  
-- Define system components and their responsibilities  
-- Show relationships between different entities  
-- Bridge system design and implementation  
+- Logs are parsed, normalized, and analyzed before incidents are created.
+- Rules are applied during incident creation.
+- Incidents can trigger alerts, produce reports, and record audit events.
+- Users view reports and authenticate through `AuthService`.
+- `Admin`, `Analyst`, and `Viewer` inherit from `User`.
 
-They are widely used during design and documentation phases.
+![Class Diagram](class-diagram.svg)
 
----
+## 2. Object Diagram
 
-## 2. Class Diagram Overview
+The object diagram shows one concrete runtime snapshot of the same design. It uses sample instances to demonstrate how data and actors move through the ALARS workflow.
 
-The **Class Diagram** represents the blueprint of the ALARS system. It defines classes, their attributes, methods, and relationships.
+### Objects shown in the snapshot
 
-### Key Elements
+- `RAW LOG`, `NORMALISED LOG`, and `RULE` represent one log-processing example.
+- `INCIDENT` and `ALERT` show the detected security event and generated alert.
+- `ADMIN`, `ANALYST`, and `VIEWER` represent the main system roles.
+- `REPORT`, `AUTH SERVICE`, `AUDIT LOG`, and `NOTIFICATION SERVICE` show the supporting services and outputs.
 
-Typical classes in ALARS may include:
+### What the snapshot illustrates
 
-- **LogManager**
-  - Handles log collection and preprocessing  
-- **Analyzer**
-  - Applies rules and detection logic  
-- **IncidentManager**
-  - Manages incident lifecycle  
-- **AlertManager**
-  - Handles alert generation and notifications  
-- **ReportManager**
-  - Generates reports and summaries  
-- **RuleEngine**
-  - Stores and evaluates detection rules  
-- **Admin/User**
-  - Interacts with the system  
+- A raw firewall log is normalized and evaluated against a rule.
+- The resulting incident creates an alert and a report.
+- Users interact with reporting and authentication services.
+- Alert generation is recorded in the audit log and forwarded to the notification service.
 
-### Relationships
+![Object Diagram](object-diagram.svg)
 
-The diagram may show:
+## 3. Summary
 
-- Associations between managers and databases  
-- Dependencies between Analyzer and RuleEngine  
-- Aggregation or composition where managers use supporting components  
-- Inheritance if there are specialized managers or users  
-
-### Goal
-
-To define:
-- System structure  
-- Responsibilities of each class  
-- How components relate to each other  
-
-### Class Diagram
-
-![Class Diagram](Class.pdf)
-
----
-
-## 3. Object Diagram Overview
-
-The **Object Diagram** shows a snapshot of the system at a particular moment. It represents real instances (objects) of classes.
-
-### Key Characteristics
-
-- Displays actual objects instead of classes  
-- Shows runtime relationships  
-- Includes object names and their current state  
-
-Example objects may include:
-
-- `logManager1 : LogManager`  
-- `analyzer1 : Analyzer`  
-- `incident1 : Incident`  
-- `alert1 : Alert`  
-- `admin1 : Admin`  
-
-### Goal
-
-To illustrate:
-- Real examples of class instantiation  
-- How objects interact at runtime  
-- Concrete system scenarios  
-
-### Object Diagram
-
-![Object Diagram](Object.pdf)
-
----
-
-## 4. How Class and Object Diagrams Connect
-
-- Class Diagram = **Blueprint**  
-- Object Diagram = **Snapshot of reality**  
-- Objects are instances of classes  
-- Object diagrams validate class design  
-
----
-
-## 5. Summary
-
-Together, Class and Object diagrams:
-
-- Clarify system design  
-- Support implementation planning  
-- Improve communication among team members  
-- Provide strong documentation for ALARS  
-
-They complement DFDs and other UML diagrams in fully describing the system.
-
----
+Together, these diagrams show both the ALARS design blueprint and a concrete runtime example. They complement the DFD documentation by linking system structure to system behavior.

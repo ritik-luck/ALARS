@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 360" role="img" aria-labelledby="title desc" shape-rendering="geometricPrecision" text-rendering="geometricPrecision">
+  <title id="title">ALARS Level 0 Data Flow Diagram</title>
+  <desc id="desc">Context diagram showing ALARS interacting with log sources, authentication, administrators, analysts, and notification services.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 12 12" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,1 L11,6 L1,11 Z" fill="#111827" stroke="#111827" stroke-width="1"/>
+    </marker>
+    <style>
+      .entity { fill: #b7d7ea; stroke: #333; stroke-width: 1.5; }
+      .system { fill: #f6b33f; stroke: #333; stroke-width: 1.8; }
+      .edge { fill: none; stroke: #111827; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow); }
+      .box-title { font-family: Arial, sans-serif; font-size: 15px; font-weight: 700; fill: #111; text-anchor: middle; dominant-baseline: middle; }
+      .flow-label { font-family: Arial, sans-serif; font-size: 12px; fill: #111; text-anchor: middle; paint-order: stroke fill; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="980" height="360" fill="#ffffff"/>
+
+  <rect class="entity" x="110" y="18" width="170" height="46" rx="3"/>
+  <text class="box-title" x="195" y="41">Log Source / Agent</text>
+
+  <rect class="entity" x="390" y="18" width="138" height="46" rx="3"/>
+  <text class="box-title" x="459" y="41">Auth Service</text>
+
+  <rect class="system" x="365" y="118" width="188" height="54" rx="4"/>
+  <text class="box-title" x="459" y="145">ALARS SYSTEM</text>
+
+  <rect class="entity" x="120" y="278" width="94" height="42" rx="3"/>
+  <text class="box-title" x="167" y="299">Admin</text>
+
+  <rect class="entity" x="468" y="278" width="110" height="42" rx="3"/>
+  <text class="box-title" x="523" y="299">Analyst</text>
+
+  <rect class="entity" x="760" y="278" width="172" height="42" rx="3"/>
+  <text class="box-title" x="846" y="299">Notification Service</text>
+
+  <path class="edge" d="M195 64 L408 118"/>
+  <text class="flow-label" x="292" y="86">Log Data</text>
+
+  <path class="edge" d="M459 64 L459 118"/>
+  <text class="flow-label" x="494" y="92">Auth Data</text>
+
+  <path class="edge" d="M365 140 C265 146 210 176 166 278"/>
+  <text class="flow-label" x="160" y="182">Reports / Alerts</text>
+
+  <path class="edge" d="M214 286 C260 214 304 186 365 154"/>
+  <text class="flow-label" x="288" y="210">Rules / Config</text>
+
+  <path class="edge" d="M553 146 C611 170 618 204 523 278"/>
+  <text class="flow-label" x="650" y="198">Incident Details</text>
+
+  <path class="edge" d="M523 278 C600 206 634 184 553 160"/>
+  <text class="flow-label" x="644" y="224">Incident Queries</text>
+
+  <path class="edge" d="M553 144 C690 150 782 186 846 278"/>
+  <text class="flow-label" x="762" y="170">Alert Notifications</text>
+</svg>

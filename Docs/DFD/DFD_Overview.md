@@ -1,119 +1,69 @@
+# DFD Overview - ALARS
 
+This document summarizes the Level 0 and Level 1 data flow diagrams for the Automated Log Analysis and Incident Response System (ALARS). The diagrams in this folder are provided as SVG so they render directly in GitHub.
 
-# DFD Overview — ALARS (Automated Log Analysis & Incident Response System)
+## 1. Purpose
 
-This document provides a brief overview of the Data Flow Diagrams (DFDs) for the **ALARS (Automated Log Analysis & Incident Response System)**. It summarizes the purpose and scope of the Level 0 and Level 1 DFDs and how they represent the flow of data in the system.
+The DFDs describe how ALARS moves data through its major processes, who interacts with the system, and where information is stored.
 
----
+## 2. Level 0 DFD
 
-## 1. Purpose of DFDs in ALARS
+The Level 0 diagram is the context view of ALARS. It treats the platform as a single system and shows the main external entities around it.
 
-Data Flow Diagrams help visualize:
+### External entities shown
 
-- How data moves through the ALARS system  
-- The main processes that transform data  
-- External entities interacting with the system  
-- Data stores where information is kept  
+- `Log Source / Agent`
+- `Auth Service`
+- `Admin`
+- `Analyst`
+- `Notification Service`
 
-They provide a clear, technology‑independent view of system functionality, useful for design, discussion, and documentation.
+### Main flows shown
 
----
+- Log data enters ALARS from log sources.
+- Authentication data enters from the auth service.
+- Admins send rules and configuration to the system and receive reports or alerts.
+- Analysts submit incident queries and receive incident details.
+- ALARS sends alert notifications to the notification service.
 
-## 2. Level 0 DFD (Context Diagram)
-
-The **Level 0 DFD** presents ALARS as a single high‑level process and shows its interaction with external entities.
-
-### Key Characteristics
-
-- Represents ALARS as one main process  
-- Shows major external entities (e.g., Admin, Log Sources/Agents, Notification Services)  
-- Highlights primary data flows such as:
-  - Log data coming into the system  
-  - Alerts and reports going out  
-  - Configuration or rule inputs from admins  
-
-### Goal
-
-To give a quick understanding of:
-- What the system does  
-- Who interacts with it  
-- The main inputs and outputs  
-
-### Level 0 Diagram
-
-![Level 0 DFD](level0.pdf)
-
----
+![Level 0 DFD](dfd-level-0.svg)
 
 ## 3. Level 1 DFD
 
-The **Level 1 DFD** decomposes the main ALARS process into sub‑processes and introduces internal data stores.
+The Level 1 diagram expands the internal processing pipeline and supporting services of ALARS.
 
-### Typical Sub‑Processes
+### Internal processes shown
 
-Examples of processes represented:
+- `1.0 Ingest Logs`
+- `2.0 Parse & Normalize`
+- `3.0 Analyze Logs`
+- `4.0 Detect Incidents`
+- `5.0 Classify Risk`
+- `6.0 Generate Alerts`
+- `7.0 Manage Users & Auth`
+- `8.0 Manage Rules`
+- `9.0 Reporting & Search`
 
-1. **Log Collection & Ingestion**  
-   - Receives logs from agents/sources  
-   - Validates and forwards logs for analysis  
+### Data stores shown
 
-2. **Log Analysis & Correlation**  
-   - Applies rules and detection logic  
-   - Identifies anomalies or incidents  
+- `Raw Log DB`
+- `Normalized Logs DB`
+- `Incident DB`
+- `User DB`
+- `Rules DB`
+- `Reports DB`
+- `Audit Logs`
 
-3. **Incident Management**  
-   - Creates and updates incidents  
-   - Tracks status and severity  
+### Main interactions shown
 
-4. **Alert & Notification Handling**  
-   - Sends alerts to admins or systems  
-   - Integrates with notification services  
+- Logs move from ingestion through parsing, analysis, incident detection, and risk classification.
+- Incidents are stored and later exposed through reporting and search.
+- Alerts are sent to the notification service and recorded in audit logs.
+- Admin, analyst, and viewer roles interact with reporting and user/authentication management.
+- Rules and user data are managed through dedicated internal stores and services.
 
-5. **Reporting & Audit**  
-   - Generates reports  
-   - Maintains audit trails  
+![Level 1 DFD](dfd-level-1.svg)
 
-### Data Stores
+## 4. Summary
 
-Common data stores include:
-
-- Log Database  
-- Incident Database  
-- Rules/Configuration Database  
-- Audit Logs  
-- Reports Database  
-
-### Goal
-
-To show:
-- Internal workflow of ALARS  
-- How data is processed step‑by‑step  
-- Where data is stored and retrieved  
-
-### Level 1 Diagram
-
-![Level 1 DFD](level1.pdf)
-
----
-
-## 4. How Level 0 and Level 1 Connect
-
-- Level 0 gives the **big picture**  
-- Level 1 gives the **detailed internal view**  
-- All inputs/outputs in Level 1 must be consistent with Level 0  
-- Level 1 processes collectively realize the single Level 0 process  
-
----
-
-## 5. Summary
-
-Together, the Level 0 and Level 1 DFDs:
-
-- Clarify system boundaries  
-- Explain internal processing  
-- Support system design and reviews  
-- Help stakeholders understand ALARS without code‑level detail  
-
-They form a foundation for deeper design (Level 2+ DFDs, architecture diagrams, and implementation).
-
----
+The Level 0 DFD shows the ALARS system boundary. The Level 1 DFD shows the internal workflow that supports detection, reporting, access control, and alerting.
