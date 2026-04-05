@@ -1,6 +1,5 @@
-# Software Engineering Lab Assignment: ALARS Architecture Analysis
 
-## Q1. Core Functional Modules Related to the Business Logic Layer (BLL)
+## Core Functional Modules Related to the Business Logic Layer (BLL)
 
 In a typical software architecture, the Business Logic Layer (BLL) serves as the mediator between the Presentation Layer (UI) and the Data Access Layer (Database). It contains the core intelligence, algorithms, domain constraints, and behavioral rules required to fulfill the specific use cases of the application. 
 
@@ -34,7 +33,7 @@ Below is the **sequence diagram** mapping exactly how the UI interacts continuou
 
 ---
 
-## Q2. Software Engineering Project Descriptions
+## Software Engineering Project Descriptions
 
 ### A) Implementation of Business Rules
 Business rules define the constraints and behaviors unique to the business domain of an application. In ALARS, the rules map diagnostic events to required human actions. We have isolated these rules into pure JavaScript functions rather than hard-coding them into route handlers, demonstrating high cohesion and low coupling.
