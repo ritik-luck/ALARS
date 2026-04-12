@@ -5,7 +5,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'change_this_secret';
 const JWT_EXPIRES = process.env.JWT_EXPIRES || '8h';
 
 exports.register = async (req, res) => {
-  const { username, password, role } = req.body;
+  const { username , password, role } = req.body;
   if (!username || !password) return res.status(400).json({ error: 'username and password required' });
 
   try {
@@ -30,7 +30,7 @@ exports.login = async (req, res) => {
     if (!user) return res.status(401).json({ error: 'Invalid credentials' });
 
     
-    if (password !== user.password) return res.status(401).json({ error: 'Invalid credentials' });
+    if (password !== user.password)  return res.status(401).json({ error: 'Invalid credentials' });
 
     const payload = { id: user.id, username: user.username, role: user.role };
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES });
