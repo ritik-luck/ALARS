@@ -32,12 +32,15 @@ CREATE TABLE IF NOT EXISTS incidents (
   log_id     INT         NOT NULL,
   risk_level VARCHAR(50) NOT NULL,            -- CRITICAL | HIGH | MEDIUM | LOW
   status     VARCHAR(50) NOT NULL DEFAULT 'open',
+  assigned_to INT NULL,
+  assigned_at DATETIME NULL,
   mitigation_action VARCHAR(100) NULL,
   mitigation_notes  TEXT NULL,
   mitigated_by      INT NULL,
   mitigated_at      DATETIME NULL,
   created_at DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_incident_log FOREIGN KEY (log_id) REFERENCES logs (id),
+  CONSTRAINT fk_incident_assigned_to FOREIGN KEY (assigned_to) REFERENCES users (id),
   CONSTRAINT fk_incident_mitigated_by FOREIGN KEY (mitigated_by) REFERENCES users (id)
 );
 
