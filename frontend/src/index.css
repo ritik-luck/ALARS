@@ -471,6 +471,85 @@ button {
   border-bottom: 0;
 }
 
+.log-filter-count {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+  min-width: 120px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: rgba(52, 209, 123, 0.08);
+}
+
+.log-filter-count strong {
+  color: var(--brand);
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.log-filter-count span {
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.log-filter-panel {
+  display: grid;
+  grid-template-columns: minmax(240px, 1.5fr) repeat(3, minmax(160px, 1fr));
+  gap: 14px;
+  align-items: end;
+  margin-bottom: 14px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at top left, rgba(52, 209, 123, 0.11), transparent 32%),
+    rgba(255, 255, 255, 0.025);
+}
+
+.log-filter-panel .field,
+.log-filter-panel__search {
+  margin-bottom: 0;
+}
+
+.log-filter-panel__search {
+  display: grid;
+  gap: 8px;
+}
+
+.filter-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.filter-chip--active {
+  border-color: rgba(52, 209, 123, 0.22);
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
 .mitigation-form {
   display: grid;
   gap: 8px;
@@ -684,7 +763,8 @@ button {
 
   .surface__toolbar,
   .dashboard-bar__actions,
-  .session-bar {
+  .session-bar,
+  .filter-summary {
     justify-content: flex-start;
   }
 
@@ -693,8 +773,13 @@ button {
   }
 
   .report-grid,
-  .report-panels {
+  .report-panels,
+  .log-filter-panel {
     grid-template-columns: 1fr;
+  }
+
+  .log-filter-count {
+    justify-items: start;
   }
 }
 
@@ -704,7 +789,8 @@ button {
   }
 
   .button-row,
-  .view-tabs {
+  .view-tabs,
+  .filter-summary {
     flex-direction: column;
   }
 

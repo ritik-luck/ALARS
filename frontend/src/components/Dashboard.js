@@ -27,6 +27,52 @@ function matchesQuery(values, query) {
   );
 }
 
+function classifyLogRisk(message) {
+  const normalizedMessage = String(message || '').toUpperCase();
+
+  if (normalizedMessage.includes('CRITICAL')) {
+    return 'CRITICAL';
+  }
+
+  if (normalizedMessage.includes('ERROR')) {
+    return 'HIGH';
+  }
+
+  if (normalizedMessage.includes('FAIL')) {
+    return 'MEDIUM';
+  }
+
+  return 'INFO';
+}
+
+function isWithinDateFilter(timestamp, filter) {
+  if (filter === 'ALL') {
+    return true;
+  }
+
+  const parsed = new Date(timestamp);
+  if (Number.isNaN(parsed.getTime())) {
+    return false;
+  }
+
+  const now = new Date();
+  const ageInMs = now.getTime() - parsed.getTime();
+
+  if (filter === '24H') {
+    return ageInMs <= 24 * 60 * 60 * 1000;
+  }
+
+  if (filter === '7D') {
+    return ageInMs <= 7 * 24 * 60 * 60 * 1000;
+  }
+
+  if (filter === '30D') {
+    return ageInMs <= 30 * 24 * 60 * 60 * 1000;
+  }
+
+  return true;
+}
+
 function ViewTab({ active, label, onClick }) {
   return (
     <button
@@ -39,21 +85,112 @@ function ViewTab({ active, label, onClick }) {
   );
 }
 
-function LogsView({ logs, totalCount, query, onQueryChange, canSubmitLogs }) {
+function LogsView({
+  logs,
+  totalCount,
+  query,
+  onQueryChange,
+  sourceFilter,
+  sourceOptions,
+  onSourceFilterChange,
+  riskFilter,
+  onRiskFilterChange,
+  dateFilter,
+  onDateFilterChange,
+  onClearFilters,
+  canSubmitLogs,
+}) {
+  const hasActiveFilters =
+    query.trim() || sourceFilter !== 'ALL' || riskFilter !== 'ALL' || dateFilter !== 'ALL';
+
   return (
     <section className="surface">
       <div className="surface__header">
-        <h2 className="surface__title">Log history</h2>
-        <div className="surface__toolbar">
-          <span className="surface__meta">{logs.length} of {totalCount}</span>
+        <div>
+          <h2 className="surface__title">Log history</h2>
+          <p className="surface__meta">Search, filter, and triage stored log events.</p>
+        </div>
+        <div className="log-filter-count">
+          <strong>{logs.length}</strong>
+          <span>of {totalCount} logs</span>
+        </div>
+      </div>
+
+      <div className="log-filter-panel">
+        <label className="log-filter-panel__search" htmlFor="log-search">
+          <span className="field__label">Search logs</span>
           <input
-            className="text-input text-input--compact"
+            id="log-search"
+            className="text-input"
             type="search"
             value={query}
             onChange={(event) => onQueryChange(event.target.value)}
-            placeholder="Search logs"
+            placeholder="Search by ID, source, message, or timestamp"
           />
+        </label>
+
+        <label className="field" htmlFor="log-source-filter">
+          <span className="field__label">Source</span>
+          <select
+            id="log-source-filter"
+            className="select-input"
+            value={sourceFilter}
+            onChange={(event) => onSourceFilterChange(event.target.value)}
+          >
+            <option value="ALL">All sources</option>
+            {sourceOptions.map((source) => (
+              <option key={source} value={source}>
+                {source}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="field" htmlFor="log-risk-filter">
+          <span className="field__label">Signal</span>
+          <select
+            id="log-risk-filter"
+            className="select-input"
+            value={riskFilter}
+            onChange={(event) => onRiskFilterChange(event.target.value)}
+          >
+            <option value="ALL">All signals</option>
+            <option value="CRITICAL">Critical</option>
+            <option value="HIGH">High / Error</option>
+            <option value="MEDIUM">Medium / Fail</option>
+            <option value="INFO">Info / Normal</option>
+          </select>
+        </label>
+
+        <label className="field" htmlFor="log-date-filter">
+          <span className="field__label">Time window</span>
+          <select
+            id="log-date-filter"
+            className="select-input"
+            value={dateFilter}
+            onChange={(event) => onDateFilterChange(event.target.value)}
+          >
+            <option value="ALL">All time</option>
+            <option value="24H">Last 24 hours</option>
+            <option value="7D">Last 7 days</option>
+            <option value="30D">Last 30 days</option>
+          </select>
+        </label>
+      </div>
+
+      <div className="filter-summary">
+        <div className="filter-chips">
+          <span className={`filter-chip ${hasActiveFilters ? 'filter-chip--active' : ''}`}>
+            {hasActiveFilters ? 'Filters active' : 'No filters'}
+          </span>
+          {query.trim() && <span className="filter-chip">Search: {query.trim()}</span>}
+          {sourceFilter !== 'ALL' && <span className="filter-chip">Source: {sourceFilter}</span>}
+          {riskFilter !== 'ALL' && <span className="filter-chip">Signal: {riskFilter}</span>}
+          {dateFilter !== 'ALL' && <span className="filter-chip">Window: {dateFilter}</span>}
         </div>
+        <button className="button-ghost button-ghost--compact" type="button" onClick={onClearFilters} disabled={!hasActiveFilters}>
+          Clear filters
+        </button>
       </div>
 
       {logs.length === 0 ? (
@@ -67,6 +204,7 @@ function LogsView({ logs, totalCount, query, onQueryChange, canSubmitLogs }) {
             <thead>
               <tr>
                 <th>ID</th>
+                <th>Signal</th>
                 <th>Source</th>
                 <th>Message</th>
                 <th>Saved at</th>
@@ -76,6 +214,11 @@ function LogsView({ logs, totalCount, query, onQueryChange, canSubmitLogs }) {
               {logs.map((log) => (
                 <tr key={log.id}>
                   <td>{log.id}</td>
+                  <td>
+                    <span className={`badge badge--${classifyLogRisk(log.message).toLowerCase()}`}>
+                      {classifyLogRisk(log.message)}
+                    </span>
+                  </td>
                   <td>{log.source}</td>
                   <td className="data-table__message-cell">{log.message}</td>
                   <td>{formatTimestamp(log.timestamp)}</td>
@@ -326,6 +469,9 @@ function Dashboard({ currentUser }) {
   const [incidentFilter, setIncidentFilter] = useState('ALL');
   const [incidentQuery, setIncidentQuery] = useState('');
   const [logQuery, setLogQuery] = useState('');
+  const [logSourceFilter, setLogSourceFilter] = useState('ALL');
+  const [logRiskFilter, setLogRiskFilter] = useState('ALL');
+  const [logDateFilter, setLogDateFilter] = useState('ALL');
   const canSubmitLogs = ['admin', 'analyst'].includes(currentUser?.role);
   const canManageUsers = currentUser?.role === 'admin';
   const canMitigate = ['admin', 'analyst'].includes(currentUser?.role);
@@ -387,9 +533,30 @@ function Dashboard({ currentUser }) {
     );
   });
 
-  const filteredLogs = logs.filter((log) =>
-    matchesQuery([log.id, log.message, log.source], logQuery)
-  );
+  const logSourceOptions = Array.from(
+    new Set(logs.map((log) => log.source).filter(Boolean))
+  ).sort((first, second) => first.localeCompare(second));
+
+  const filteredLogs = logs.filter((log) => {
+    const riskLevel = classifyLogRisk(log.message);
+    const matchesSource = logSourceFilter === 'ALL' || log.source === logSourceFilter;
+    const matchesRisk = logRiskFilter === 'ALL' || riskLevel === logRiskFilter;
+    const matchesDate = isWithinDateFilter(log.timestamp, logDateFilter);
+
+    return (
+      matchesSource &&
+      matchesRisk &&
+      matchesDate &&
+      matchesQuery([log.id, log.message, log.source, log.timestamp, riskLevel], logQuery)
+    );
+  });
+
+  function clearLogFilters() {
+    setLogQuery('');
+    setLogSourceFilter('ALL');
+    setLogRiskFilter('ALL');
+    setLogDateFilter('ALL');
+  }
 
   async function handleApplyMitigation(incidentId, payload) {
     await applyIncidentMitigation(incidentId, payload);
@@ -474,6 +641,14 @@ function Dashboard({ currentUser }) {
           totalCount={logs.length}
           query={logQuery}
           onQueryChange={setLogQuery}
+          sourceFilter={logSourceFilter}
+          sourceOptions={logSourceOptions}
+          onSourceFilterChange={setLogSourceFilter}
+          riskFilter={logRiskFilter}
+          onRiskFilterChange={setLogRiskFilter}
+          dateFilter={logDateFilter}
+          onDateFilterChange={setLogDateFilter}
+          onClearFilters={clearLogFilters}
           canSubmitLogs={canSubmitLogs}
         />
       )}
