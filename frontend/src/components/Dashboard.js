@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import LogUpload from './LogUpload';
 import IncidentTable from './IncidentTable';
-import { fetchIncidents, fetchLogs, register } from '../api';
+import { fetchIncidents, fetchLogs, fetchSystemReport, register } from '../api';
 
 function formatTimestamp(value) {
   if (!value) {
@@ -179,9 +179,147 @@ function AdminUsersPanel() {
   );
 }
 
+function formatMetricLabel(value) {
+  return String(value || 'Unknown').replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function ReportMetric({ label, value }) {
+  return (
+    <div className="report-card">
+      <span className="report-card__label">{label}</span>
+      <strong className="report-card__value">{value}</strong>
+    </div>
+  );
+}
+
+function ReportList({ title, items, emptyText }) {
+  return (
+    <div className="report-panel">
+      <h3 className="report-panel__title">{title}</h3>
+      {items.length === 0 ? (
+        <p className="report-panel__empty">{emptyText}</p>
+      ) : (
+        <div className="report-list">
+          {items.map((item) => (
+            <div className="report-list__row" key={item.label}>
+              <span>{formatMetricLabel(item.label)}</span>
+              <strong>{item.count}</strong>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SystemReportView({ report, loading }) {
+  if (loading && !report) {
+    return (
+      <section className="surface">
+        <div className="empty-state">
+          <strong>Generating report...</strong>
+          <p>Collecting log and incident metrics.</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (!report) {
+    return (
+      <section className="surface">
+        <div className="empty-state">
+          <strong>No report available.</strong>
+          <p>Refresh the dashboard after the backend is online.</p>
+        </div>
+      </section>
+    );
+  }
+
+  const totals = report.totals || {};
+  const recentIncidents = Array.isArray(report.recentIncidents) ? report.recentIncidents : [];
+
+  return (
+    <section className="surface">
+      <div className="surface__header">
+        <div>
+          <h2 className="surface__title">System report</h2>
+          <p className="surface__meta">Generated {formatTimestamp(report.generatedAt)}</p>
+        </div>
+        <span className="surface__meta">Read access for Admin, Analyst, and Viewer</span>
+      </div>
+
+      <div className="report-grid">
+        <ReportMetric label="Total logs" value={totals.logs || 0} />
+        <ReportMetric label="Total incidents" value={totals.incidents || 0} />
+        <ReportMetric label="Critical incidents" value={totals.criticalIncidents || 0} />
+        <ReportMetric label="Open incidents" value={totals.openIncidents || 0} />
+      </div>
+
+      <div className="report-panels">
+        <ReportList
+          title="Incidents by risk"
+          items={Array.isArray(report.incidentsByRisk) ? report.incidentsByRisk : []}
+          emptyText="No incidents have been detected yet."
+        />
+        <ReportList
+          title="Incidents by status"
+          items={Array.isArray(report.incidentsByStatus) ? report.incidentsByStatus : []}
+          emptyText="No incident status data yet."
+        />
+        <ReportList
+          title="Top log sources"
+          items={Array.isArray(report.logsBySource) ? report.logsBySource : []}
+          emptyText="No log source data yet."
+        />
+      </div>
+
+      <div className="report-panel report-panel--wide">
+        <h3 className="report-panel__title">Recent incident summary</h3>
+        {recentIncidents.length === 0 ? (
+          <p className="report-panel__empty">No recent incidents found.</p>
+        ) : (
+          <div className="table-wrap">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Risk</th>
+                  <th>Status</th>
+                  <th>Source</th>
+                  <th>Detected at</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentIncidents.map((incident) => (
+                  <tr key={incident.id}>
+                    <td>{incident.id}</td>
+                    <td>
+                      <span className={`badge badge--${String(incident.risk_level || 'info').toLowerCase()}`}>
+                        {incident.risk_level}
+                      </span>
+                    </td>
+                    <td>
+                      <span className="badge badge--status">
+                        {formatMetricLabel(incident.status)}
+                      </span>
+                    </td>
+                    <td>{incident.source}</td>
+                    <td>{formatTimestamp(incident.created_at)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 function Dashboard({ currentUser }) {
   const [logs, setLogs] = useState([]);
   const [incidents, setIncidents] = useState([]);
+  const [systemReport, setSystemReport] = useState(null);
   const [activeView, setActiveView] = useState('submit');
   const [connectionState, setConnectionState] = useState('loading');
   const [refreshing, setRefreshing] = useState(false);
@@ -195,13 +333,15 @@ function Dashboard({ currentUser }) {
     setRefreshing(true);
 
     try {
-      const [logsResponse, incidentsResponse] = await Promise.all([
+      const [logsResponse, incidentsResponse, reportResponse] = await Promise.all([
         fetchLogs(),
         fetchIncidents(),
+        fetchSystemReport(),
       ]);
 
       setLogs(Array.isArray(logsResponse.data) ? logsResponse.data : []);
       setIncidents(Array.isArray(incidentsResponse.data) ? incidentsResponse.data : []);
+      setSystemReport(reportResponse.data || null);
       setConnectionState('online');
     } catch {
       setConnectionState('offline');
@@ -271,6 +411,11 @@ function Dashboard({ currentUser }) {
             label={`Logs (${logs.length})`}
             onClick={() => setActiveView('logs')}
           />
+          <ViewTab
+            active={activeView === 'reports'}
+            label="Reports"
+            onClick={() => setActiveView('reports')}
+          />
           {canManageUsers && (
             <ViewTab
               active={activeView === 'users'}
@@ -323,6 +468,10 @@ function Dashboard({ currentUser }) {
           onQueryChange={setLogQuery}
           canSubmitLogs={canSubmitLogs}
         />
+      )}
+
+      {activeView === 'reports' && (
+        <SystemReportView report={systemReport} loading={refreshing} />
       )}
 
       {activeView === 'users' && canManageUsers && (

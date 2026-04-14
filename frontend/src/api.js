@@ -20,6 +20,10 @@ export const fetchLogs = () =>
 export const fetchIncidents = () =>
   axios.get(`${API_BASE}/incidents`, { headers: authHeaders() });
 
+// Fetch generated system report
+export const fetchSystemReport = () =>
+  axios.get(`${API_BASE}/reports/system`, { headers: authHeaders() });
+
 // Auth endpoints
 export const login = (username, password) =>
   axios.post(`${API_BASE}/auth/login`, { username, password });
