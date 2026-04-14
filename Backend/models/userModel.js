@@ -19,6 +19,14 @@ module.exports = {
     return rows[0];
   },
 
+  findByRole: async (role) => {
+    const [rows] = await pool.execute(
+      'SELECT id, username, role, created_at FROM users WHERE role = ? ORDER BY username ASC',
+      [role]
+    );
+    return rows;
+  },
+
   countUsers: async () => {
     const [rows] = await pool.execute('SELECT COUNT(*) AS count FROM users');
     return rows[0].count;
