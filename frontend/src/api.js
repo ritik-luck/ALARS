@@ -20,6 +20,10 @@ export const fetchLogs = () =>
 export const fetchIncidents = () =>
   axios.get(`${API_BASE}/incidents`, { headers: authHeaders() });
 
+// Apply analyst mitigation action
+export const applyIncidentMitigation = (incidentId, payload) =>
+  axios.patch(`${API_BASE}/incidents/${incidentId}/mitigation`, payload, { headers: authHeaders() });
+
 // Fetch generated system report
 export const fetchSystemReport = () =>
   axios.get(`${API_BASE}/reports/system`, { headers: authHeaders() });

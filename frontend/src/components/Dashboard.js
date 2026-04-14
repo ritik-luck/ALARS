@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import LogUpload from './LogUpload';
 import IncidentTable from './IncidentTable';
-import { fetchIncidents, fetchLogs, fetchSystemReport, register } from '../api';
+import { applyIncidentMitigation, fetchIncidents, fetchLogs, fetchSystemReport, register } from '../api';
 
 function formatTimestamp(value) {
   if (!value) {
@@ -328,6 +328,7 @@ function Dashboard({ currentUser }) {
   const [logQuery, setLogQuery] = useState('');
   const canSubmitLogs = ['admin', 'analyst'].includes(currentUser?.role);
   const canManageUsers = currentUser?.role === 'admin';
+  const canMitigate = ['admin', 'analyst'].includes(currentUser?.role);
 
   const loadData = useCallback(async () => {
     setRefreshing(true);
@@ -389,6 +390,11 @@ function Dashboard({ currentUser }) {
   const filteredLogs = logs.filter((log) =>
     matchesQuery([log.id, log.message, log.source], logQuery)
   );
+
+  async function handleApplyMitigation(incidentId, payload) {
+    await applyIncidentMitigation(incidentId, payload);
+    await loadData();
+  }
 
   return (
     <div className="dashboard">
@@ -457,6 +463,8 @@ function Dashboard({ currentUser }) {
           onSeverityChange={setIncidentFilter}
           searchValue={incidentQuery}
           onSearchChange={setIncidentQuery}
+          canMitigate={canMitigate}
+          onApplyMitigation={handleApplyMitigation}
         />
       )}
 

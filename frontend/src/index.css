@@ -322,6 +322,10 @@ button {
   color: var(--text);
 }
 
+.button-ghost--compact {
+  padding: 9px 12px;
+}
+
 .view-tab:hover,
 .button-primary:hover,
 .button-ghost:hover {
@@ -465,6 +469,36 @@ button {
 
 .report-list__row:last-child {
   border-bottom: 0;
+}
+
+.mitigation-form {
+  display: grid;
+  gap: 8px;
+  min-width: 220px;
+}
+
+.mitigation-form .select-input--compact,
+.mitigation-form .text-input--compact {
+  min-width: 220px;
+  max-width: none;
+}
+
+.mitigation-form__error {
+  color: var(--danger);
+  font-size: 0.84rem;
+  line-height: 1.4;
+}
+
+.mitigation-summary {
+  display: grid;
+  gap: 4px;
+  min-width: 160px;
+}
+
+.mitigation-summary span,
+.mitigation-summary small {
+  color: var(--muted);
+  line-height: 1.5;
 }
 
 .empty-state {
