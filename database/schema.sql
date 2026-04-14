@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
   id         INT          AUTO_INCREMENT PRIMARY KEY,
   username   VARCHAR(100) NOT NULL UNIQUE,
   password   VARCHAR(255) NOT NULL,           -- store hashed passwords in production
-  role       VARCHAR(50)  NOT NULL DEFAULT 'user',
+  role       VARCHAR(50)  NOT NULL DEFAULT 'viewer',
   created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -48,4 +48,5 @@ CREATE TABLE IF NOT EXISTS alerts (
 -- ── Sample seed data (optional demo rows) ────────────────────
 INSERT INTO users (username, password, role) VALUES
   ('admin', 'changeme_hash_this', 'admin'),
-  ('analyst', 'changeme_hash_this', 'user');
+  ('analyst', 'changeme_hash_this', 'analyst'),
+  ('viewer', 'changeme_hash_this', 'viewer');
