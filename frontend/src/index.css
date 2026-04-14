@@ -116,6 +116,19 @@ button {
   margin-top: 20px;
 }
 
+.session-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.session-bar__user {
+  color: var(--muted);
+  font-weight: 700;
+}
+
 .dashboard {
   display: grid;
   gap: 16px;
@@ -333,6 +346,12 @@ button {
   background: var(--danger-soft);
   border-color: rgba(255, 138, 138, 0.18);
   color: #ffbfbf;
+}
+
+.message--success {
+  background: var(--brand-soft);
+  border-color: rgba(52, 209, 123, 0.18);
+  color: #baf6d2;
 }
 
 .result-panel {
@@ -555,7 +574,8 @@ button {
   }
 
   .surface__toolbar,
-  .dashboard-bar__actions {
+  .dashboard-bar__actions,
+  .session-bar {
     justify-content: flex-start;
   }
 

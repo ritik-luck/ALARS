@@ -24,5 +24,8 @@ export const fetchIncidents = () =>
 export const login = (username, password) =>
   axios.post(`${API_BASE}/auth/login`, { username, password });
 
-export const register = (username, password, role = 'user') =>
-  axios.post(`${API_BASE}/auth/register`, { username, password, role });
+export const register = (username, password, role = 'viewer') =>
+  axios.post(`${API_BASE}/auth/register`, { username, password, role }, { headers: authHeaders() });
+
+export const fetchCurrentUser = () =>
+  axios.get(`${API_BASE}/auth/me`, { headers: authHeaders() });

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { login as apiLogin } from '../api';
-import { setToken } from '../auth';
+import { setSession } from '../auth';
 
 function Login({ onLogin }) {
   const [username, setUsername] = useState('');
@@ -14,9 +14,9 @@ function Login({ onLogin }) {
     setLoading(true);
     try {
       const res = await apiLogin(username, password);
-      const { token } = res.data;
-      setToken(token);
-      onLogin();
+      const { token, user } = res.data;
+      setSession(token, user);
+      onLogin(user);
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed');
     } finally {

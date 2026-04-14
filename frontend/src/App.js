@@ -1,19 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import Dashboard from './components/Dashboard';
 import Login from './components/Login';
-import { getToken, clearToken } from './auth';
+import { getToken, getUser, clearToken } from './auth';
 
 function App() {
-  const [authenticated, setAuthenticated] = useState(false);
+  const [authenticated, setAuthenticated] = useState(() => !!getToken());
+  const [currentUser, setCurrentUser] = useState(() => getUser());
 
   useEffect(() => {
     setAuthenticated(!!getToken());
+    setCurrentUser(getUser());
   }, []);
 
-  const handleLogin = () => setAuthenticated(true);
+  const handleLogin = (user) => {
+    setAuthenticated(true);
+    setCurrentUser(user || getUser());
+  };
+
   const handleLogout = () => {
     clearToken();
     setAuthenticated(false);
+    setCurrentUser(null);
   };
 
   return (
@@ -32,10 +39,15 @@ function App() {
       <main className="app-main">
         {authenticated ? (
           <>
-            <div style={{ textAlign: 'right', marginBottom: 8 }}>
+            <div className="session-bar">
+              {currentUser && (
+                <span className="session-bar__user">
+                  Signed in as {currentUser.username} ({currentUser.role})
+                </span>
+              )}
               <button className="button-ghost" onClick={handleLogout}>Sign out</button>
             </div>
-            <Dashboard />
+            <Dashboard currentUser={currentUser} />
           </>
         ) : (
           <Login onLogin={handleLogin} />

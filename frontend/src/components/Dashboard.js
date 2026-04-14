@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import LogUpload from './LogUpload';
 import IncidentTable from './IncidentTable';
-import { fetchIncidents, fetchLogs } from '../api';
+import { fetchIncidents, fetchLogs, register } from '../api';
 
 function formatTimestamp(value) {
   if (!value) {
@@ -39,7 +39,7 @@ function ViewTab({ active, label, onClick }) {
   );
 }
 
-function LogsView({ logs, totalCount, query, onQueryChange }) {
+function LogsView({ logs, totalCount, query, onQueryChange, canSubmitLogs }) {
   return (
     <section className="surface">
       <div className="surface__header">
@@ -59,7 +59,7 @@ function LogsView({ logs, totalCount, query, onQueryChange }) {
       {logs.length === 0 ? (
         <div className="empty-state">
           <strong>No logs found.</strong>
-          <p>Submit a log or clear the search input.</p>
+          <p>{canSubmitLogs ? 'Submit a log or clear the search input.' : 'Ask an admin or analyst to submit logs, or clear the search input.'}</p>
         </div>
       ) : (
         <div className="table-wrap">
@@ -89,7 +89,97 @@ function LogsView({ logs, totalCount, query, onQueryChange }) {
   );
 }
 
-function Dashboard() {
+function AdminUsersPanel() {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('viewer');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setMessage('');
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await register(username.trim(), password, role);
+      setMessage(`Created ${response.data.username} as ${response.data.role}.`);
+      setUsername('');
+      setPassword('');
+      setRole('viewer');
+    } catch (creationError) {
+      setError(creationError.response?.data?.error || 'Could not create user.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <section className="surface">
+      <div className="surface__header">
+        <h2 className="surface__title">User management</h2>
+        <span className="surface__meta">Admin only</span>
+      </div>
+
+      <form onSubmit={handleSubmit}>
+        <div className="form-grid">
+          <label className="field" htmlFor="new-username">
+            <span className="field__label">Username</span>
+            <input
+              id="new-username"
+              className="text-input"
+              type="text"
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
+              placeholder="Example: viewer01"
+              required
+            />
+          </label>
+
+          <label className="field" htmlFor="new-role">
+            <span className="field__label">Role</span>
+            <select
+              id="new-role"
+              className="select-input"
+              value={role}
+              onChange={(event) => setRole(event.target.value)}
+            >
+              <option value="admin">Admin</option>
+              <option value="analyst">Analyst</option>
+              <option value="viewer">Viewer</option>
+            </select>
+          </label>
+        </div>
+
+        <label className="field" htmlFor="new-password">
+          <span className="field__label">Temporary password</span>
+          <input
+            id="new-password"
+            className="text-input"
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="Set an initial password"
+            required
+          />
+        </label>
+
+        <div className="button-row">
+          <button className="button-primary" type="submit" disabled={loading}>
+            {loading ? 'Creating...' : 'Create user'}
+          </button>
+        </div>
+
+        {message && <div className="message message--success">{message}</div>}
+        {error && <div className="message message--error">{error}</div>}
+      </form>
+    </section>
+  );
+}
+
+function Dashboard({ currentUser }) {
   const [logs, setLogs] = useState([]);
   const [incidents, setIncidents] = useState([]);
   const [activeView, setActiveView] = useState('submit');
@@ -98,6 +188,8 @@ function Dashboard() {
   const [incidentFilter, setIncidentFilter] = useState('ALL');
   const [incidentQuery, setIncidentQuery] = useState('');
   const [logQuery, setLogQuery] = useState('');
+  const canSubmitLogs = ['admin', 'analyst'].includes(currentUser?.role);
+  const canManageUsers = currentUser?.role === 'admin';
 
   const loadData = useCallback(async () => {
     setRefreshing(true);
@@ -121,6 +213,12 @@ function Dashboard() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  useEffect(() => {
+    if (!canSubmitLogs && activeView === 'submit') {
+      setActiveView('incidents');
+    }
+  }, [activeView, canSubmitLogs]);
 
   const countsBySeverity = incidents.reduce(
     (totals, incident) => {
@@ -156,11 +254,13 @@ function Dashboard() {
     <div className="dashboard">
       <div className="dashboard-bar">
         <div className="view-tabs">
-          <ViewTab
-            active={activeView === 'submit'}
-            label="Submit log"
-            onClick={() => setActiveView('submit')}
-          />
+          {canSubmitLogs && (
+            <ViewTab
+              active={activeView === 'submit'}
+              label="Submit log"
+              onClick={() => setActiveView('submit')}
+            />
+          )}
           <ViewTab
             active={activeView === 'incidents'}
             label={`Incidents (${incidents.length})`}
@@ -171,6 +271,13 @@ function Dashboard() {
             label={`Logs (${logs.length})`}
             onClick={() => setActiveView('logs')}
           />
+          {canManageUsers && (
+            <ViewTab
+              active={activeView === 'users'}
+              label="Users"
+              onClick={() => setActiveView('users')}
+            />
+          )}
         </div>
 
         <div className="dashboard-bar__actions">
@@ -192,7 +299,7 @@ function Dashboard() {
         </div>
       </div>
 
-      {activeView === 'submit' && (
+      {activeView === 'submit' && canSubmitLogs && (
         <LogUpload onLogSubmitted={loadData} />
       )}
 
@@ -214,7 +321,12 @@ function Dashboard() {
           totalCount={logs.length}
           query={logQuery}
           onQueryChange={setLogQuery}
+          canSubmitLogs={canSubmitLogs}
         />
+      )}
+
+      {activeView === 'users' && canManageUsers && (
+        <AdminUsersPanel />
       )}
     </div>
   );
