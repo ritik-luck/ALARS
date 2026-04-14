@@ -98,6 +98,92 @@ function MitigationForm({ incident, onApplyMitigation }) {
   );
 }
 
+function AssignmentForm({ incident, analysts, onAssignIncident }) {
+  const [analystId, setAnalystId] = useState(incident.assigned_to || '');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setError('');
+
+    if (!analystId) {
+      setError('Choose an analyst.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await onAssignIncident(incident.id, Number(analystId));
+    } catch (assignmentError) {
+      setError(assignmentError.response?.data?.error || 'Could not assign incident.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <form className="incident-action-form" onSubmit={handleSubmit}>
+      <select
+        className="select-input select-input--compact"
+        value={analystId}
+        onChange={(event) => setAnalystId(event.target.value)}
+      >
+        <option value="">Assign analyst</option>
+        {analysts.map((analyst) => (
+          <option key={analyst.id} value={analyst.id}>
+            {analyst.username}
+          </option>
+        ))}
+      </select>
+      <button className="button-ghost button-ghost--compact" type="submit" disabled={loading || analysts.length === 0}>
+        {loading ? 'Assigning...' : 'Assign'}
+      </button>
+      {error && <span className="mitigation-form__error">{error}</span>}
+    </form>
+  );
+}
+
+function StatusForm({ incident, onUpdateStatus }) {
+  const [status, setStatus] = useState(incident.status || 'open');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      await onUpdateStatus(incident.id, status);
+    } catch (statusError) {
+      setError(statusError.response?.data?.error || 'Could not update status.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <form className="incident-action-form" onSubmit={handleSubmit}>
+      <select
+        className="select-input select-input--compact"
+        value={status}
+        onChange={(event) => setStatus(event.target.value)}
+      >
+        {STATUS_OPTIONS.map((item) => (
+          <option key={item.value} value={item.value}>
+            {item.label}
+          </option>
+        ))}
+      </select>
+      <button className="button-ghost button-ghost--compact" type="submit" disabled={loading}>
+        {loading ? 'Updating...' : status === 'resolved' ? 'Resolve' : 'Update'}
+      </button>
+      {error && <span className="mitigation-form__error">{error}</span>}
+    </form>
+  );
+}
+
 function IncidentTable({
   incidents,
   totalCount,
@@ -108,6 +194,11 @@ function IncidentTable({
   onSearchChange,
   canMitigate,
   onApplyMitigation,
+  canAssign,
+  analysts,
+  onAssignIncident,
+  canUpdateStatus,
+  onUpdateStatus,
 }) {
   return (
     <section className="surface">
@@ -152,8 +243,11 @@ function IncidentTable({
                 <th>Source</th>
                 <th>Risk</th>
                 <th>Status</th>
+                <th>Assigned to</th>
                 <th>Mitigation</th>
                 <th>Detected at</th>
+                {canAssign && <th>Assign</th>}
+                {canUpdateStatus && <th>Status action</th>}
                 {canMitigate && <th>Action</th>}
               </tr>
             </thead>
@@ -174,6 +268,16 @@ function IncidentTable({
                     </span>
                   </td>
                   <td>
+                    {incident.assigned_to_username ? (
+                      <div className="mitigation-summary">
+                        <strong>{incident.assigned_to_username}</strong>
+                        {incident.assigned_at && <small>{formatTimestamp(incident.assigned_at)}</small>}
+                      </div>
+                    ) : (
+                      <span className="surface__meta">Unassigned</span>
+                    )}
+                  </td>
+                  <td>
                     {incident.mitigation_action ? (
                       <div className="mitigation-summary">
                         <strong>{toTitleCase(incident.mitigation_action)}</strong>
@@ -185,6 +289,23 @@ function IncidentTable({
                     )}
                   </td>
                   <td>{formatTimestamp(incident.created_at)}</td>
+                  {canAssign && (
+                    <td>
+                      <AssignmentForm
+                        incident={incident}
+                        analysts={analysts}
+                        onAssignIncident={onAssignIncident}
+                      />
+                    </td>
+                  )}
+                  {canUpdateStatus && (
+                    <td>
+                      <StatusForm
+                        incident={incident}
+                        onUpdateStatus={onUpdateStatus}
+                      />
+                    </td>
+                  )}
                   {canMitigate && (
                     <td>
                       <MitigationForm

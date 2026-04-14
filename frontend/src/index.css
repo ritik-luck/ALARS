@@ -604,14 +604,17 @@ button {
   accent-color: var(--brand);
 }
 
-.mitigation-form {
+.mitigation-form,
+.incident-action-form {
   display: grid;
   gap: 8px;
   min-width: 220px;
 }
 
 .mitigation-form .select-input--compact,
-.mitigation-form .text-input--compact {
+.mitigation-form .text-input--compact,
+.incident-action-form .select-input--compact,
+.incident-action-form .text-input--compact {
   min-width: 220px;
   max-width: none;
 }

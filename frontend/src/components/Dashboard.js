@@ -3,11 +3,14 @@ import LogUpload from './LogUpload';
 import IncidentTable from './IncidentTable';
 import {
   applyIncidentMitigation,
+  assignIncident,
   fetchDetectionRules,
+  fetchAnalysts,
   fetchIncidents,
   fetchLogs,
   fetchSystemReport,
   register,
+  updateIncidentStatus,
   updateDetectionRule,
 } from '../api';
 
@@ -663,6 +666,7 @@ function SystemReportView({ report, loading }) {
 function Dashboard({ currentUser }) {
   const [logs, setLogs] = useState([]);
   const [incidents, setIncidents] = useState([]);
+  const [analysts, setAnalysts] = useState([]);
   const [systemReport, setSystemReport] = useState(null);
   const [detectionRules, setDetectionRules] = useState([]);
   const [activeView, setActiveView] = useState('submit');
@@ -677,29 +681,34 @@ function Dashboard({ currentUser }) {
   const canSubmitLogs = ['admin', 'analyst'].includes(currentUser?.role);
   const canManageUsers = currentUser?.role === 'admin';
   const canMitigate = ['admin', 'analyst'].includes(currentUser?.role);
+  const canAssign = currentUser?.role === 'admin';
+  const canUpdateStatus = ['admin', 'analyst'].includes(currentUser?.role);
 
   const loadData = useCallback(async () => {
     setRefreshing(true);
 
     try {
-      const [logsResponse, incidentsResponse, reportResponse, rulesResponse] = await Promise.all([
+      const analystsRequest = canAssign ? fetchAnalysts() : Promise.resolve({ data: [] });
+      const [logsResponse, incidentsResponse, reportResponse, rulesResponse, analystsResponse] = await Promise.all([
         fetchLogs(),
         fetchIncidents(),
         fetchSystemReport(),
         fetchDetectionRules(),
+        analystsRequest,
       ]);
 
       setLogs(Array.isArray(logsResponse.data) ? logsResponse.data : []);
       setIncidents(Array.isArray(incidentsResponse.data) ? incidentsResponse.data : []);
       setSystemReport(reportResponse.data || null);
       setDetectionRules(Array.isArray(rulesResponse.data) ? rulesResponse.data : []);
+      setAnalysts(Array.isArray(analystsResponse.data) ? analystsResponse.data : []);
       setConnectionState('online');
     } catch {
       setConnectionState('offline');
     } finally {
       setRefreshing(false);
     }
-  }, []);
+  }, [canAssign]);
 
   useEffect(() => {
     loadData();
@@ -764,6 +773,16 @@ function Dashboard({ currentUser }) {
 
   async function handleApplyMitigation(incidentId, payload) {
     await applyIncidentMitigation(incidentId, payload);
+    await loadData();
+  }
+
+  async function handleAssignIncident(incidentId, analystId) {
+    await assignIncident(incidentId, analystId);
+    await loadData();
+  }
+
+  async function handleUpdateStatus(incidentId, status) {
+    await updateIncidentStatus(incidentId, status);
     await loadData();
   }
 
@@ -848,6 +867,11 @@ function Dashboard({ currentUser }) {
           onSearchChange={setIncidentQuery}
           canMitigate={canMitigate}
           onApplyMitigation={handleApplyMitigation}
+          canAssign={canAssign}
+          analysts={analysts}
+          onAssignIncident={handleAssignIncident}
+          canUpdateStatus={canUpdateStatus}
+          onUpdateStatus={handleUpdateStatus}
         />
       )}
 

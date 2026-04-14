@@ -20,6 +20,18 @@ export const fetchLogs = () =>
 export const fetchIncidents = () =>
   axios.get(`${API_BASE}/incidents`, { headers: authHeaders() });
 
+// Fetch analysts for admin incident assignment
+export const fetchAnalysts = () =>
+  axios.get(`${API_BASE}/incidents/analysts`, { headers: authHeaders() });
+
+// Assign incident to analyst
+export const assignIncident = (incidentId, analystId) =>
+  axios.patch(`${API_BASE}/incidents/${incidentId}/assign`, { analystId }, { headers: authHeaders() });
+
+// Update incident workflow status
+export const updateIncidentStatus = (incidentId, status) =>
+  axios.patch(`${API_BASE}/incidents/${incidentId}/status`, { status }, { headers: authHeaders() });
+
 // Apply analyst mitigation action
 export const applyIncidentMitigation = (incidentId, payload) =>
   axios.patch(`${API_BASE}/incidents/${incidentId}/mitigation`, payload, { headers: authHeaders() });
