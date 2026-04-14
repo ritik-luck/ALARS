@@ -26,13 +26,16 @@ function App() {
   return (
     <div className="app-shell">
       <header className="app-header">
-        <div>
-          <span className="app-header__eyebrow">ALARS</span>
-          <h1 className="app-header__title">Log Monitoring Console</h1>
+        <div className="app-header__brand">
+          <div className="logo-mark logo-mark--small">TL</div>
+          <div>
+            <span className="app-header__eyebrow">ThreatLens</span>
+            <h1 className="app-header__title">Security Intelligence Console</h1>
+          </div>
         </div>
 
         <p className="app-header__copy">
-          Submit logs, review incidents, and inspect stored history.
+          A focused lens for live logs, incident response, and risk signals.
         </p>
       </header>
 

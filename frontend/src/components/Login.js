@@ -28,15 +28,18 @@ function Login({ onLogin }) {
     <div className="login-viewport">
       <div className="login-card">
         <div className="login-brand">
-          <div className="logo-mark">AL</div>
+          <div className="logo-mark">TL</div>
           <div>
-            <div className="brand-title">ALARS</div>
-            <div className="brand-sub">Log Analysis & Incident Response</div>
+            <div className="brand-title">ThreatLens</div>
+            <div className="brand-sub">Log Intelligence & Incident Response</div>
           </div>
         </div>
 
         <form className="login-form-advanced" onSubmit={handleSubmit}>
-          <h2 className="login-heading">Sign in to your account</h2>
+          <div>
+            <span className="login-kicker">Command access</span>
+            <h2 className="login-heading">Enter the ThreatLens console</h2>
+          </div>
 
           {error && <div className="message message--error">{error}</div>}
 
@@ -83,6 +86,17 @@ function Login({ onLogin }) {
       </div>
 
       <div className="login-visual">
+        <div className="threat-orb">
+          <div className="threat-orb__ring threat-orb__ring--outer" />
+          <div className="threat-orb__ring threat-orb__ring--inner" />
+          <div className="threat-orb__core">TL</div>
+          <div className="threat-orb__scan" />
+        </div>
+        <div className="login-visual__copy">
+          <span>Signal clarity</span>
+          <strong>Detect. Assign. Resolve.</strong>
+          <p>Rules, reports, mitigation, and role-based operations in one polished command surface.</p>
+        </div>
         <svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" aria-hidden>
           <defs>
             <linearGradient id="g1" x1="0" x2="1">
