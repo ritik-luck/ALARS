@@ -1,7 +1,7 @@
 const pool = require('../config/db');
 
 module.exports = {
-  createUser: async ({ username, password, role = 'user' }) => {
+  createUser: async ({ username, password, role = 'viewer' }) => {
     const [result] = await pool.execute(
       'INSERT INTO users (username, password, role) VALUES (?, ?, ?)',
       [username, password, role]
@@ -17,5 +17,10 @@ module.exports = {
   findById: async (id) => {
     const [rows] = await pool.execute('SELECT id, username, role, created_at FROM users WHERE id = ?', [id]);
     return rows[0];
+  },
+
+  countUsers: async () => {
+    const [rows] = await pool.execute('SELECT COUNT(*) AS count FROM users');
+    return rows[0].count;
   },
 };
