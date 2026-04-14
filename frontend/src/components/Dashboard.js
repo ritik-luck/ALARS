@@ -1,7 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import LogUpload from './LogUpload';
 import IncidentTable from './IncidentTable';
-import { applyIncidentMitigation, fetchIncidents, fetchLogs, fetchSystemReport, register } from '../api';
+import {
+  applyIncidentMitigation,
+  fetchDetectionRules,
+  fetchIncidents,
+  fetchLogs,
+  fetchSystemReport,
+  register,
+  updateDetectionRule,
+} from '../api';
 
 function formatTimestamp(value) {
   if (!value) {
@@ -27,7 +35,31 @@ function matchesQuery(values, query) {
   );
 }
 
-function classifyLogRisk(message) {
+const RISK_PRIORITY = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'INFO'];
+
+function countKeywordMatches(message, keyword) {
+  const normalizedMessage = String(message || '').toUpperCase();
+  const normalizedKeyword = String(keyword || '').toUpperCase();
+
+  if (!normalizedKeyword) {
+    return 0;
+  }
+
+  return normalizedMessage.split(normalizedKeyword).length - 1;
+}
+
+function classifyLogRisk(message, rules = []) {
+  const matchedRuleLevels = rules
+    .filter((rule) => Number(rule.enabled) === 1)
+    .filter((rule) => countKeywordMatches(message, rule.keyword) >= Number(rule.threshold_count || 1))
+    .map((rule) => rule.risk_level);
+
+  for (const riskLevel of RISK_PRIORITY) {
+    if (matchedRuleLevels.includes(riskLevel)) {
+      return riskLevel;
+    }
+  }
+
   const normalizedMessage = String(message || '').toUpperCase();
 
   if (normalizedMessage.includes('CRITICAL')) {
@@ -99,6 +131,7 @@ function LogsView({
   onDateFilterChange,
   onClearFilters,
   canSubmitLogs,
+  detectionRules,
 }) {
   const hasActiveFilters =
     query.trim() || sourceFilter !== 'ALL' || riskFilter !== 'ALL' || dateFilter !== 'ALL';
@@ -215,8 +248,8 @@ function LogsView({
                 <tr key={log.id}>
                   <td>{log.id}</td>
                   <td>
-                    <span className={`badge badge--${classifyLogRisk(log.message).toLowerCase()}`}>
-                      {classifyLogRisk(log.message)}
+                    <span className={`badge badge--${classifyLogRisk(log.message, detectionRules).toLowerCase()}`}>
+                      {classifyLogRisk(log.message, detectionRules)}
                     </span>
                   </td>
                   <td>{log.source}</td>
@@ -318,6 +351,174 @@ function AdminUsersPanel() {
         {message && <div className="message message--success">{message}</div>}
         {error && <div className="message message--error">{error}</div>}
       </form>
+    </section>
+  );
+}
+
+function RulesPanel({ rules, onUpdateRule }) {
+  const [drafts, setDrafts] = useState({});
+  const [savingRuleId, setSavingRuleId] = useState(null);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+
+  function getDraft(rule) {
+    return {
+      keyword: rule.keyword,
+      riskLevel: rule.risk_level,
+      createsIncident: Number(rule.creates_incident) === 1,
+      alertEnabled: Number(rule.alert_enabled) === 1,
+      thresholdCount: Number(rule.threshold_count || 1),
+      enabled: Number(rule.enabled) === 1,
+      ...(drafts[rule.id] || {}),
+    };
+  }
+
+  function updateDraft(rule, changes) {
+    setDrafts((currentDrafts) => ({
+      ...currentDrafts,
+      [rule.id]: {
+        ...getDraft(rule),
+        ...changes,
+      },
+    }));
+  }
+
+  async function handleSubmit(event, rule) {
+    event.preventDefault();
+    setMessage('');
+    setError('');
+    setSavingRuleId(rule.id);
+
+    try {
+      await onUpdateRule(rule.id, getDraft(rule));
+      setDrafts((currentDrafts) => {
+        const nextDrafts = { ...currentDrafts };
+        delete nextDrafts[rule.id];
+        return nextDrafts;
+      });
+      setMessage(`Updated ${getDraft(rule).keyword}.`);
+    } catch (ruleError) {
+      setError(ruleError.response?.data?.error || 'Could not update detection rule.');
+    } finally {
+      setSavingRuleId(null);
+    }
+  }
+
+  return (
+    <section className="surface">
+      <div className="surface__header">
+        <div>
+          <h2 className="surface__title">Rules & thresholds</h2>
+          <p className="surface__meta">Admin controls for incident keywords, severity, alerting, and match thresholds.</p>
+        </div>
+        <span className="surface__meta">{rules.length} rules</span>
+      </div>
+
+      {message && <div className="message message--success">{message}</div>}
+      {error && <div className="message message--error">{error}</div>}
+
+      {rules.length === 0 ? (
+        <div className="empty-state">
+          <strong>No rules found.</strong>
+          <p>Run the detection_rules migration or refresh after the backend is online.</p>
+        </div>
+      ) : (
+        <div className="rules-grid">
+          {rules.map((rule) => {
+            const draft = getDraft(rule);
+
+            return (
+              <form className="rule-card" key={rule.id || rule.keyword} onSubmit={(event) => handleSubmit(event, rule)}>
+                <div className="rule-card__header">
+                  <strong>{rule.keyword}</strong>
+                  <label className="switch-field">
+                    <input
+                      type="checkbox"
+                      checked={draft.enabled}
+                      disabled={!rule.id}
+                      onChange={(event) => updateDraft(rule, { enabled: event.target.checked })}
+                    />
+                    Enabled
+                  </label>
+                </div>
+
+                <label className="field" htmlFor={`rule-keyword-${rule.id}`}>
+                  <span className="field__label">Keyword</span>
+                  <input
+                    id={`rule-keyword-${rule.id}`}
+                    className="text-input"
+                    value={draft.keyword}
+                    disabled={!rule.id}
+                    onChange={(event) => updateDraft(rule, { keyword: event.target.value })}
+                  />
+                </label>
+
+                <div className="form-grid">
+                  <label className="field" htmlFor={`rule-risk-${rule.id}`}>
+                    <span className="field__label">Severity</span>
+                    <select
+                      id={`rule-risk-${rule.id}`}
+                      className="select-input"
+                      value={draft.riskLevel}
+                      disabled={!rule.id}
+                      onChange={(event) => updateDraft(rule, { riskLevel: event.target.value })}
+                    >
+                      <option value="CRITICAL">Critical</option>
+                      <option value="HIGH">High</option>
+                      <option value="MEDIUM">Medium</option>
+                      <option value="LOW">Low</option>
+                      <option value="INFO">Info</option>
+                    </select>
+                  </label>
+
+                  <label className="field" htmlFor={`rule-threshold-${rule.id}`}>
+                    <span className="field__label">Match threshold</span>
+                    <input
+                      id={`rule-threshold-${rule.id}`}
+                      className="text-input"
+                      type="number"
+                      min="1"
+                      value={draft.thresholdCount}
+                      disabled={!rule.id}
+                      onChange={(event) => updateDraft(rule, { thresholdCount: Number(event.target.value) })}
+                    />
+                  </label>
+                </div>
+
+                <div className="rule-card__toggles">
+                  <label className="switch-field">
+                    <input
+                      type="checkbox"
+                      checked={draft.createsIncident}
+                      disabled={!rule.id}
+                      onChange={(event) => updateDraft(rule, { createsIncident: event.target.checked })}
+                    />
+                    Creates incident
+                  </label>
+
+                  <label className="switch-field">
+                    <input
+                      type="checkbox"
+                      checked={draft.alertEnabled}
+                      disabled={!rule.id}
+                      onChange={(event) => updateDraft(rule, { alertEnabled: event.target.checked })}
+                    />
+                    Triggers alert
+                  </label>
+                </div>
+
+                {!rule.id && (
+                  <p className="rule-card__hint">Default fallback rule. Run the database migration to edit it.</p>
+                )}
+
+                <button className="button-primary" type="submit" disabled={!rule.id || savingRuleId === rule.id}>
+                  {savingRuleId === rule.id ? 'Saving...' : 'Save rule'}
+                </button>
+              </form>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 }
@@ -463,6 +664,7 @@ function Dashboard({ currentUser }) {
   const [logs, setLogs] = useState([]);
   const [incidents, setIncidents] = useState([]);
   const [systemReport, setSystemReport] = useState(null);
+  const [detectionRules, setDetectionRules] = useState([]);
   const [activeView, setActiveView] = useState('submit');
   const [connectionState, setConnectionState] = useState('loading');
   const [refreshing, setRefreshing] = useState(false);
@@ -480,15 +682,17 @@ function Dashboard({ currentUser }) {
     setRefreshing(true);
 
     try {
-      const [logsResponse, incidentsResponse, reportResponse] = await Promise.all([
+      const [logsResponse, incidentsResponse, reportResponse, rulesResponse] = await Promise.all([
         fetchLogs(),
         fetchIncidents(),
         fetchSystemReport(),
+        fetchDetectionRules(),
       ]);
 
       setLogs(Array.isArray(logsResponse.data) ? logsResponse.data : []);
       setIncidents(Array.isArray(incidentsResponse.data) ? incidentsResponse.data : []);
       setSystemReport(reportResponse.data || null);
+      setDetectionRules(Array.isArray(rulesResponse.data) ? rulesResponse.data : []);
       setConnectionState('online');
     } catch {
       setConnectionState('offline');
@@ -538,7 +742,7 @@ function Dashboard({ currentUser }) {
   ).sort((first, second) => first.localeCompare(second));
 
   const filteredLogs = logs.filter((log) => {
-    const riskLevel = classifyLogRisk(log.message);
+    const riskLevel = classifyLogRisk(log.message, detectionRules);
     const matchesSource = logSourceFilter === 'ALL' || log.source === logSourceFilter;
     const matchesRisk = logRiskFilter === 'ALL' || riskLevel === logRiskFilter;
     const matchesDate = isWithinDateFilter(log.timestamp, logDateFilter);
@@ -560,6 +764,11 @@ function Dashboard({ currentUser }) {
 
   async function handleApplyMitigation(incidentId, payload) {
     await applyIncidentMitigation(incidentId, payload);
+    await loadData();
+  }
+
+  async function handleUpdateRule(ruleId, payload) {
+    await updateDetectionRule(ruleId, payload);
     await loadData();
   }
 
@@ -594,6 +803,13 @@ function Dashboard({ currentUser }) {
               active={activeView === 'users'}
               label="Users"
               onClick={() => setActiveView('users')}
+            />
+          )}
+          {canManageUsers && (
+            <ViewTab
+              active={activeView === 'rules'}
+              label="Rules"
+              onClick={() => setActiveView('rules')}
             />
           )}
         </div>
@@ -650,6 +866,7 @@ function Dashboard({ currentUser }) {
           onDateFilterChange={setLogDateFilter}
           onClearFilters={clearLogFilters}
           canSubmitLogs={canSubmitLogs}
+          detectionRules={detectionRules}
         />
       )}
 
@@ -659,6 +876,10 @@ function Dashboard({ currentUser }) {
 
       {activeView === 'users' && canManageUsers && (
         <AdminUsersPanel />
+      )}
+
+      {activeView === 'rules' && canManageUsers && (
+        <RulesPanel rules={detectionRules} onUpdateRule={handleUpdateRule} />
       )}
     </div>
   );

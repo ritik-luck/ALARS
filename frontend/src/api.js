@@ -28,6 +28,13 @@ export const applyIncidentMitigation = (incidentId, payload) =>
 export const fetchSystemReport = () =>
   axios.get(`${API_BASE}/reports/system`, { headers: authHeaders() });
 
+// Detection rule endpoints
+export const fetchDetectionRules = () =>
+  axios.get(`${API_BASE}/rules`, { headers: authHeaders() });
+
+export const updateDetectionRule = (ruleId, payload) =>
+  axios.patch(`${API_BASE}/rules/${ruleId}`, payload, { headers: authHeaders() });
+
 // Auth endpoints
 export const login = (username, password) =>
   axios.post(`${API_BASE}/auth/login`, { username, password });

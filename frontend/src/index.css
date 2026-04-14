@@ -550,6 +550,60 @@ button {
   color: var(--brand);
 }
 
+.rules-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.rule-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015)),
+    rgba(255, 255, 255, 0.02);
+}
+
+.rule-card__header,
+.rule-card__toggles,
+.switch-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rule-card__header {
+  justify-content: space-between;
+}
+
+.rule-card__header strong {
+  font-size: 1.1rem;
+}
+
+.rule-card__toggles {
+  flex-wrap: wrap;
+}
+
+.rule-card__hint {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.switch-field {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.switch-field input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--brand);
+}
+
 .mitigation-form {
   display: grid;
   gap: 8px;
@@ -774,7 +828,8 @@ button {
 
   .report-grid,
   .report-panels,
-  .log-filter-panel {
+  .log-filter-panel,
+  .rules-grid {
     grid-template-columns: 1fr;
   }
 
