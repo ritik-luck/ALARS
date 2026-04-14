@@ -50,8 +50,30 @@ CREATE TABLE IF NOT EXISTS alerts (
   CONSTRAINT fk_alert_incident FOREIGN KEY (incident_id) REFERENCES incidents (id)
 );
 
+-- ── Detection Rules / Thresholds ─────────────────────────────
+CREATE TABLE IF NOT EXISTS detection_rules (
+  id              INT          AUTO_INCREMENT PRIMARY KEY,
+  keyword         VARCHAR(100) NOT NULL UNIQUE,
+  risk_level      VARCHAR(50)  NOT NULL DEFAULT 'INFO',
+  creates_incident TINYINT(1)  NOT NULL DEFAULT 0,
+  alert_enabled   TINYINT(1)   NOT NULL DEFAULT 0,
+  threshold_count INT          NOT NULL DEFAULT 1,
+  enabled         TINYINT(1)   NOT NULL DEFAULT 1,
+  updated_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 -- ── Sample seed data (optional demo rows) ────────────────────
 INSERT INTO users (username, password, role) VALUES
   ('admin', 'changeme_hash_this', 'admin'),
   ('analyst', 'changeme_hash_this', 'analyst'),
   ('viewer', 'changeme_hash_this', 'viewer');
+
+INSERT IGNORE INTO detection_rules
+  (keyword, risk_level, creates_incident, alert_enabled, threshold_count, enabled)
+VALUES
+  ('CRITICAL', 'CRITICAL', 1, 1, 1, 1),
+  ('ERROR', 'HIGH', 1, 0, 1, 1),
+  ('FAIL', 'MEDIUM', 1, 0, 1, 1),
+  ('WARNING', 'LOW', 0, 0, 1, 1),
+  ('EXCEPTION', 'HIGH', 1, 0, 1, 1),
+  ('TIMEOUT', 'HIGH', 1, 0, 1, 1);
