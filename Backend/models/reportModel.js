@@ -42,6 +42,8 @@ async function getSystemReport() {
         i.id,
         i.risk_level,
         i.status,
+        i.mitigation_action,
+        i.mitigated_at,
         i.created_at,
         l.message AS log_message,
         l.source
