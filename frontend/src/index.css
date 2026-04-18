@@ -318,6 +318,17 @@ button {
   background-repeat: no-repeat;
 }
 
+.select-input option {
+  background: #101915;
+  color: #f4f7f5;
+}
+
+.select-input option:checked {
+  background: #34d17b;
+  color: #031008;
+}
+
+
 .select-input:focus,
 .text-input:focus,
 .text-area:focus {
