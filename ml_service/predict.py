@@ -48,7 +48,6 @@ _STRONG_ANOMALY_KW = [
     "terminating", "terminated",
     "outofmemory", "outofmemoryerror", "oom",
     "ioexception", "nullpointerexception", "illegalstateexception",
-    "stackoverflowerror", "stackoverflow",
     "refused", "rejected", "abort", "aborted",
     "corrupt", "corrupted",
     "unreachable", "broken",
@@ -58,7 +57,6 @@ _STRONG_ANOMALY_KW = [
 
 _CRITICAL_KW = [
     "fatal", "outofmemory", "outofmemoryerror", "oom",
-    "stackoverflowerror", "stackoverflow",
     "panic", "crash", "killed", "shutdown",
     "terminating", "terminated",
 ]

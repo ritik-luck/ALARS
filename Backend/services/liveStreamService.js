@@ -333,7 +333,8 @@ class LiveStreamService extends EventEmitter {
     try {
       // Drain one-by-one while awaiting ML classification + DB write for strict sequencing.
       while (this.state.running && this.queue.length > 0) {
-        const entry = this.queue.shift();
+          const entry = this.queue.shift();
+          this.emitStatus(); // Update UI immediately after shifting from queue
 
         try {
           const result = await processIncomingLog(entry.message, entry.source);
@@ -353,6 +354,7 @@ class LiveStreamService extends EventEmitter {
           this.state.totalProcessed += 1;
           this.state.lastEventAt = payload.streamedAt;
           this.emit('log', payload);
+          this.emitStatus(); // Update UI immediately after processing
         } catch (error) {
           this.captureError(error);
         }
