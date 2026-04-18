@@ -1,0 +1,161 @@
+/* =============================================
+   ALARS CINEMATIC BACKGROUND — 7-LAYER SYSTEM
+   ============================================= */
+
+.dynamic-bg-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+/* ---- LAYER 1: Deep Base Gradient ---- */
+.bg-base {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 15%, rgba(16, 185, 129, 0.12), transparent 50%),
+    radial-gradient(ellipse 70% 50% at 85% 25%, rgba(20, 184, 166, 0.10), transparent 50%),
+    radial-gradient(ellipse 60% 80% at 50% 90%, rgba(6, 78, 59, 0.08), transparent 50%),
+    var(--bg-gradient);
+}
+
+/* ---- LAYER 2: Glow Orbs (Drifting + Parallax) ---- */
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.blob-1 {
+  width: 55vw;
+  height: 55vw;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.2), transparent 70%);
+  top: -15vw;
+  left: -15vw;
+  animation: orb-drift-1 30s infinite ease-in-out alternate;
+}
+
+.blob-2 {
+  width: 45vw;
+  height: 45vw;
+  background: radial-gradient(circle, rgba(20, 184, 166, 0.15), transparent 70%);
+  bottom: -10vw;
+  right: -10vw;
+  animation: orb-drift-2 35s infinite ease-in-out alternate;
+}
+
+.blob-3 {
+  width: 35vw;
+  height: 35vw;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.1), transparent 70%);
+  top: 40%;
+  left: 50%;
+  animation: orb-drift-3 25s infinite ease-in-out alternate;
+}
+
+@keyframes orb-drift-1 {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(4vw, 6vh) scale(1.1); }
+}
+
+@keyframes orb-drift-2 {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-5vw, -8vh) scale(1.1); }
+}
+
+@keyframes orb-drift-3 {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-8vw, 5vh) scale(1.2); }
+}
+
+/* ---- LAYER 3: Aurora ---- */
+.bg-aurora {
+  position: absolute;
+  inset: -20%;
+  opacity: 0.35;
+  filter: blur(80px);
+  pointer-events: none;
+  background: conic-gradient(from 180deg at 50% 50%, transparent 0deg, rgba(16, 185, 129, 0.05) 60deg, transparent 120deg, rgba(20, 184, 166, 0.04) 200deg, transparent 280deg);
+  animation: aurora-rotate 60s linear infinite;
+}
+
+@keyframes aurora-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ---- LAYER 4: Tech Grid ---- */
+.bg-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 50px 50px;
+  mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, black 20%, transparent 80%);
+}
+
+/* ---- LAYER 5: Parallax Stars ---- */
+.stars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.stars-small {
+  width: 1px;
+  height: 1px;
+  background: transparent;
+  box-shadow: 100px 200px #FFF, 500px 800px #FFF, 1200px 300px #FFF, 400px 100px #FFF, 900px 1000px #FFF, 1500px 500px #FFF, 800px 200px rgba(255, 255, 255, 0.3), 1400px 1400px rgba(255, 255, 255, 0.3);
+  animation: animStar 100s linear infinite;
+}
+
+.stars-medium {
+  width: 2px;
+  height: 2px;
+  background: transparent;
+  box-shadow: 200px 300px #FFF, 700px 600px #FFF, 1300px 140px #FFF, 800px 900px rgba(255, 255, 255, 0.5);
+  animation: animStar 150s linear infinite;
+}
+
+.stars-large {
+  width: 3px;
+  height: 3px;
+  background: transparent;
+  box-shadow: 300px 400px #FFF, 900px 200px #FFF, 1500px 800px #FFF;
+  animation: animStar 200s linear infinite;
+}
+
+@keyframes animStar {
+  from { transform: translateY(0); }
+  to { transform: translateY(-1000px); }
+}
+
+/* ---- LAYER 6: Film Grain ---- */
+.bg-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  mix-blend-mode: overlay;
+  z-index: 10;
+}
+
+/* ---- LAYER 7: Vignette ---- */
+.bg-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.8);
+  z-index: 11;
+}

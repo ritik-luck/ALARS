@@ -3,3 +3,18 @@ node_modules/
 *.log
 .DS_Store
 frontend/build/
+__pycache__/
+.venv/
+ml_service/.venv/
+ml_service/.winvenv/
+
+# Datasets and Experiments
+dataset/
+log_risk_model/
+ml_risk_classifier_experiment/
+ml_standard_hdfs_experiment/
+
+# Test Artifacts
+*.txt
+results.json
+test_results.json

@@ -1,0 +1,348 @@
+{
+  "dataset_info": {
+    "total_samples": 7940,
+    "normal_count": 7627,
+    "anomaly_count": 313,
+    "unique_blocks": 7940,
+    "avg_text_length": 3671,
+    "max_text_length": 59808,
+    "min_text_length": 661,
+    "avg_lines_per_block": 13.2,
+    "max_lines_per_block": 249,
+    "avg_unique_events": 5.16,
+    "avg_unique_components": 3.18,
+    "label_granularity": "block_level",
+    "structured_log_lines": 104815,
+    "structured_unique_blocks": 7940,
+    "dropped_lines_without_block_id": 0,
+    "raw_label_count": 575061,
+    "raw_normal_count": 558223,
+    "raw_anomaly_count": 16838,
+    "matched_blocks": 7940,
+    "matched_normal_count": 7627,
+    "matched_anomaly_count": 313,
+    "unmatched_labeled_blocks": 567121,
+    "document_fields": [
+      "Content",
+      "EventTemplate",
+      "EventId",
+      "Component",
+      "Level"
+    ]
+  },
+  "split_info": {
+    "train_samples": 5081,
+    "validation_samples": 1271,
+    "test_samples": 1588,
+    "train_anomaly_rate": 0.039362,
+    "validation_anomaly_rate": 0.039339,
+    "test_anomaly_rate": 0.039673
+  },
+  "model_selection": {
+    "xgboost": {
+      "validation_binary_metrics": {
+        "accuracy": 0.977183320220299,
+        "precision": 1.0,
+        "recall": 0.42,
+        "f1_score": 0.5915492957746479,
+        "balanced_accuracy": 0.71,
+        "average_precision": 0.4675928316915116,
+        "decision_threshold": 0.949999988079071,
+        "confusion_matrix": [
+          [
+            1221,
+            0
+          ],
+          [
+            29,
+            21
+          ]
+        ],
+        "classification_report": {
+          "Normal": {
+            "precision": 0.9768,
+            "recall": 1.0,
+            "f1-score": 0.9882638607851072,
+            "support": 1221.0
+          },
+          "Anomaly": {
+            "precision": 1.0,
+            "recall": 0.42,
+            "f1-score": 0.5915492957746479,
+            "support": 50.0
+          },
+          "accuracy": 0.977183320220299,
+          "macro avg": {
+            "precision": 0.9884,
+            "recall": 0.71,
+            "f1-score": 0.7899065782798775,
+            "support": 1271.0
+          },
+          "weighted avg": {
+            "precision": 0.9777126671911881,
+            "recall": 0.977183320220299,
+            "f1-score": 0.9726574656234054,
+            "support": 1271.0
+          }
+        },
+        "predicted_positive_rate": 0.016522423288749016,
+        "roc_auc": 0.7254217854217854
+      },
+      "validation_risk_metrics": {
+        "risk_distribution": {
+          "LOW": 375,
+          "MEDIUM": 787,
+          "HIGH": 84,
+          "CRITICAL": 25
+        },
+        "by_true_label": {
+          "Normal": {
+            "LOW": 368,
+            "MEDIUM": 767,
+            "HIGH": 82,
+            "CRITICAL": 4
+          },
+          "Anomaly": {
+            "LOW": 7,
+            "MEDIUM": 20,
+            "HIGH": 2,
+            "CRITICAL": 21
+          }
+        },
+        "thresholds": {
+          "LOW": 0.3,
+          "MEDIUM": 0.5,
+          "HIGH": 0.7
+        },
+        "anomaly_detection_as_high_critical": 0.46,
+        "anomaly_detection_as_critical": 0.42,
+        "normal_false_alarm_as_high_critical": 0.0704
+      },
+      "decision_threshold": 0.949999988079071,
+      "risk_thresholds": {
+        "LOW": 0.3,
+        "MEDIUM": 0.5,
+        "HIGH": 0.7
+      },
+      "training_info": {
+        "search_metric": "average_precision",
+        "best_cv_score": 0.547297070278884,
+        "best_params": {
+          "subsample": 1.0,
+          "reg_lambda": 1.5,
+          "reg_alpha": 0.1,
+          "n_estimators": 250,
+          "min_child_weight": 3,
+          "max_depth": 6,
+          "learning_rate": 0.05,
+          "gamma": 0.1,
+          "colsample_bytree": 1.0
+        },
+        "scale_pos_weight": 24.405,
+        "training_time_seconds": 156.9
+      }
+    },
+    "random_forest": {
+      "validation_binary_metrics": {
+        "accuracy": 0.977183320220299,
+        "precision": 1.0,
+        "recall": 0.42,
+        "f1_score": 0.5915492957746479,
+        "balanced_accuracy": 0.71,
+        "average_precision": 0.454964963553143,
+        "decision_threshold": 0.95,
+        "confusion_matrix": [
+          [
+            1221,
+            0
+          ],
+          [
+            29,
+            21
+          ]
+        ],
+        "classification_report": {
+          "Normal": {
+            "precision": 0.9768,
+            "recall": 1.0,
+            "f1-score": 0.9882638607851072,
+            "support": 1221.0
+          },
+          "Anomaly": {
+            "precision": 1.0,
+            "recall": 0.42,
+            "f1-score": 0.5915492957746479,
+            "support": 50.0
+          },
+          "accuracy": 0.977183320220299,
+          "macro avg": {
+            "precision": 0.9884,
+            "recall": 0.71,
+            "f1-score": 0.7899065782798775,
+            "support": 1271.0
+          },
+          "weighted avg": {
+            "precision": 0.9777126671911881,
+            "recall": 0.977183320220299,
+            "f1-score": 0.9726574656234054,
+            "support": 1271.0
+          }
+        },
+        "predicted_positive_rate": 0.016522423288749016,
+        "roc_auc": 0.7030303030303031
+      },
+      "validation_risk_metrics": {
+        "risk_distribution": {
+          "LOW": 189,
+          "MEDIUM": 1,
+          "HIGH": 197,
+          "CRITICAL": 884
+        },
+        "by_true_label": {
+          "Normal": {
+            "LOW": 186,
+            "MEDIUM": 0,
+            "HIGH": 192,
+            "CRITICAL": 843
+          },
+          "Anomaly": {
+            "LOW": 3,
+            "MEDIUM": 1,
+            "HIGH": 5,
+            "CRITICAL": 41
+          }
+        },
+        "thresholds": {
+          "LOW": 0.3,
+          "MEDIUM": 0.5,
+          "HIGH": 0.85
+        },
+        "anomaly_detection_as_high_critical": 0.92,
+        "anomaly_detection_as_critical": 0.82,
+        "normal_false_alarm_as_high_critical": 0.8477
+      },
+      "decision_threshold": 0.95,
+      "risk_thresholds": {
+        "LOW": 0.3,
+        "MEDIUM": 0.5,
+        "HIGH": 0.85
+      },
+      "training_info": {
+        "search_metric": "average_precision",
+        "best_cv_score": 0.532104861177181,
+        "best_params": {
+          "n_estimators": 500,
+          "min_samples_split": 2,
+          "min_samples_leaf": 4,
+          "max_features": "log2",
+          "max_depth": 15
+        },
+        "training_time_seconds": 379.7
+      }
+    }
+  },
+  "final_test": {
+    "model_name": "xgboost",
+    "binary_metrics": {
+      "accuracy": 0.9785894206549118,
+      "precision": 0.967741935483871,
+      "recall": 0.47619047619047616,
+      "f1_score": 0.6382978723404256,
+      "balanced_accuracy": 0.7377673692427791,
+      "average_precision": 0.5299762718310869,
+      "decision_threshold": 0.949999988079071,
+      "confusion_matrix": [
+        [
+          1524,
+          1
+        ],
+        [
+          33,
+          30
+        ]
+      ],
+      "classification_report": {
+        "Normal": {
+          "precision": 0.9788053949903661,
+          "recall": 0.999344262295082,
+          "f1-score": 0.9889682024659312,
+          "support": 1525.0
+        },
+        "Anomaly": {
+          "precision": 0.967741935483871,
+          "recall": 0.47619047619047616,
+          "f1-score": 0.6382978723404256,
+          "support": 63.0
+        },
+        "accuracy": 0.9785894206549118,
+        "macro avg": {
+          "precision": 0.9732736652371186,
+          "recall": 0.7377673692427791,
+          "f1-score": 0.8136330374031784,
+          "support": 1588.0
+        },
+        "weighted avg": {
+          "precision": 0.9783664794054107,
+          "recall": 0.9785894206549118,
+          "f1-score": 0.975056218336267,
+          "support": 1588.0
+        }
+      },
+      "predicted_positive_rate": 0.01952141057934509,
+      "roc_auc": 0.749768410096279
+    },
+    "risk_level_metrics": {
+      "risk_distribution": {
+        "LOW": 504,
+        "MEDIUM": 978,
+        "HIGH": 60,
+        "CRITICAL": 46
+      },
+      "by_true_label": {
+        "Normal": {
+          "LOW": 494,
+          "MEDIUM": 956,
+          "HIGH": 60,
+          "CRITICAL": 15
+        },
+        "Anomaly": {
+          "LOW": 10,
+          "MEDIUM": 22,
+          "HIGH": 0,
+          "CRITICAL": 31
+        }
+      },
+      "thresholds": {
+        "LOW": 0.3,
+        "MEDIUM": 0.5,
+        "HIGH": 0.7
+      },
+      "anomaly_detection_as_high_critical": 0.4921,
+      "anomaly_detection_as_critical": 0.4921,
+      "normal_false_alarm_as_high_critical": 0.0492
+    },
+    "decision_threshold": 0.949999988079071,
+    "risk_thresholds": {
+      "LOW": 0.3,
+      "MEDIUM": 0.5,
+      "HIGH": 0.7
+    },
+    "training_info": {
+      "search_metric": "average_precision",
+      "best_cv_score": 0.547297070278884,
+      "best_params": {
+        "subsample": 1.0,
+        "reg_lambda": 1.5,
+        "reg_alpha": 0.1,
+        "n_estimators": 250,
+        "min_child_weight": 3,
+        "max_depth": 6,
+        "learning_rate": 0.05,
+        "gamma": 0.1,
+        "colsample_bytree": 1.0
+      },
+      "scale_pos_weight": 24.405,
+      "training_time_seconds": 156.9
+    }
+  }
+}

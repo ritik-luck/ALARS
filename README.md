@@ -1,268 +1,250 @@
-# ALARS — Automated Log Analysis & Incident Response System
+# ALARS - Automated Log Analysis & Incident Response System
 
-A university lab demonstration project showing how logs are ingested, parsed,
-analyzed, and turned into incidents and alerts in real time.
+ALARS is a university demonstration project for log ingestion, ML-based risk
+classification, incident creation, and alerting.
 
+## Architecture
+
+```text
+React Frontend -> Node.js API -> MySQL
+                      |
+                      -> Flask ML Service -> Binary Anomaly Model -> Risk Levels
+                      |
+                      -> Live Ingestion Service -> Public APIs / URLs
+                                                -> SSE Dashboard Stream
 ```
-User → React Frontend → Node.js API → MySQL Database
-                                     ↓
-                              Log Parser & Analyzer
-                                     ↓
-                           Incident Detector → Risk Classifier
-                                     ↓
-                              Alert Generator → Incident Reports
-```
 
----
+The live app now uses the Flask ML service on port `5001` for prediction. If
+that service is unavailable, the backend falls back to the legacy keyword
+detector so the demo still runs.
+
+Live ingestion can poll Reddit, GitHub public events, StackOverflow, USGS
+earthquake feeds, Wikipedia/Wikidata recent changes, or a custom public
+JSON/text/RSS/XML URL. A universal data normalization layer auto-detects the
+payload shape and converts API responses into clean log-like text before ML
+classification, so raw JSON payloads such as Reddit `Listing` objects are never
+sent to the model. The service then deduplicates external event IDs in memory,
+stores the resulting log rows, and pushes classified results to the dashboard
+over Server-Sent Events.
 
 ## Tech Stack
 
-| Layer    | Technology          |
-|----------|---------------------|
-| Frontend | React.js 18         |
-| Backend  | Node.js + Express   |
-| Database | MySQL               |
-
----
-
-## Project Structure
-
-```
-alars-system/
-├── backend/
-│   ├── server.js                  ← Express entry point
-│   ├── .env.example               ← Environment variable template
-│   ├── config/
-│   │   └── db.js                  ← MySQL connection pool
-│   ├── routes/
-│   │   ├── logRoutes.js
-│   │   └── incidentRoutes.js
-│   ├── controllers/
-│   │   ├── logController.js       ← Orchestrates the full log pipeline
-│   │   └── incidentController.js
-│   ├── services/
-│   │   ├── logParser.js           ← Cleans raw log text
-│   │   ├── logAnalyzer.js         ← Keyword detection
-│   │   ├── incidentDetector.js    ← Decides whether to raise an incident
-│   │   ├── riskClassifier.js      ← Assigns CRITICAL / HIGH / MEDIUM / LOW
-│   │   └── alertGenerator.js      ← Creates DB alert for CRITICAL incidents
-│   └── models/
-│       ├── logModel.js
-│       └── incidentModel.js
-│
-├── frontend/
-│   ├── public/index.html
-│   └── src/
-│       ├── index.js
-│       ├── App.js
-│       ├── api.js                 ← axios wrappers for all API calls
-│       └── components/
-│           ├── LogUpload.js       ← Log submission form
-│           ├── IncidentTable.js   ← Incident listing
-│           └── Dashboard.js       ← Stats + tabs layout
-│
-└── database/
-    └── schema.sql                 ← Full DB schema + seed data
-```
-
----
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 18 |
+| Backend | Node.js + Express |
+| ML Service | Flask + scikit-learn + XGBoost |
+| Database | MySQL |
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org/) v18 or later
-- [MySQL](https://dev.mysql.com/downloads/) 8.0 or later (MySQL Community Edition is free)
-- A terminal / command prompt
+- Node.js 18+
+- MySQL 8+
+- Python environment for `ml_service`
 
----
+## Step 1 - Set Up MySQL
 
-## Step 1 — Set Up the MySQL Database
+Run the schema:
 
-1. Open **MySQL Workbench** or the MySQL CLI.
-2. Run the schema script:
-
-```sql
--- In MySQL Workbench: File → Open SQL Script → select database/schema.sql, then click ⚡
--- Or via CLI:
+```bash
 mysql -u root -p < database/schema.sql
 ```
 
-This creates the `alars_db` database with tables:
-`users`, `logs`, `incidents`, `alerts`
+This creates `alars_db` with `users`, `logs`, `incidents`, and `alerts`.
 
----
-
-## Step 2 — Configure the Backend
+## Step 2 - Configure the Backend
 
 ```bash
-cd alars-system/backend
-```
-
-Copy the example environment file and edit it:
-
-```bash
-# Windows
+cd backend
 copy .env.example .env
-
-# macOS / Linux
-cp .env.example .env
 ```
 
-Open `.env` and set your MySQL password:
+Set your values in `.env`:
 
-```
+```env
 PORT=5000
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=YourMySQLPasswordHere
 DB_NAME=alars_db
+ML_SERVICE_URL=http://localhost:5001
+ML_SERVICE_TIMEOUT_MS=12000
+LIVE_STREAM_AUTOSTART=false
+LIVE_STREAM_SOURCE_TYPE=github
+LIVE_STREAM_SOURCE_URL=
+LIVE_STREAM_POLL_INTERVAL_MS=60000
+LIVE_STREAM_PROCESS_INTERVAL_MS=1500
+LIVE_STREAM_MAX_PER_POLL=10
+GITHUB_EVENTS_URL=https://api.github.com/events
 ```
 
-> If your MySQL root account has no password, leave `DB_PASSWORD=` blank.
-
----
-
-## Step 3 — Install & Run the Backend
+## Step 3 - Run the Backend
 
 ```bash
-cd alars-system/backend
-
+cd backend
 npm install
-
-# Development mode (auto-restart on file changes)
-npm run dev
-
-# OR production mode
 npm start
 ```
 
-Expected output:
-```
+Expected:
+
+```text
 ALARS Backend running on http://localhost:5000
 ```
 
-Test it quickly:
-```bash
-curl http://localhost:5000/
-# → {"message":"ALARS API is running","version":"1.0.0"}
+## Step 4 - Run the ML Service
+
+From the project root:
+
+```powershell
+.\ml_service\.winvenv\Scripts\python.exe ml_service\server.py
 ```
 
----
+Expected:
 
-## Step 4 — Install & Run the React Frontend
+```text
+ALARS ML service starting on port 5001...
+ML service ready. Model: xgboost
+```
 
-Open a **second** terminal:
+Quick check:
 
 ```bash
-cd alars-system/frontend
+curl http://localhost:5001/health
+curl http://localhost:5001/model-info
+```
 
+## Step 5 - Run the Frontend
+
+```bash
+cd frontend
 npm install
-
 npm start
 ```
 
-The browser opens automatically at **http://localhost:3000**.
+Open `http://localhost:3000`.
 
-> The backend must be running on port 5000 before submitting logs.
+## What the UI Can Do
 
----
+- Submit a single log line through the ML-backed backend
+- Upload a `.log`, `.txt`, or `.csv` file and process each non-empty line
+- Show anomaly probability, binary prediction, risk score, and top features
+- Start/stop live external ingestion and watch classified events stream in
+  without refreshing the page
+- Choose a built-in public source or paste a custom public URL for extraction
+- Normalize Reddit, StackOverflow, GitHub, USGS earthquake GeoJSON, MediaWiki,
+  generic JSON arrays/objects, RSS/XML, and plain text into readable log lines
+  before ML classification
+- Apply source-aware severity rules so social and Q&A text stays INFO unless it
+  contains strong security terms, while earthquake feeds use magnitude/alert
+  thresholds
+- Persist logs and incidents in MySQL
+- Show incident history and log history in the dashboard
 
-## API Reference
+## API Endpoints
 
-### POST /api/logs — Submit a log
+### Submit one log
 
 ```http
-POST http://localhost:5000/api/logs
+POST /api/logs
 Content-Type: application/json
 
 {
-  "message": "CRITICAL: Disk failure on /dev/sda",
-  "source":  "storage-monitor"
+  "message": "PacketResponder 1 for block blk_-1608999687919862906 terminating",
+  "source": "hdfs-packet-responder"
 }
 ```
 
-Response:
-```json
+### Submit many log lines
+
+```http
+POST /api/logs/batch
+Content-Type: application/json
+
 {
-  "success": true,
-  "log":      { "id": 1, "message": "...", "source": "storage-monitor" },
-  "incident": { "id": 1, "riskLevel": "CRITICAL" },
-  "alert":    { "alertId": 1, "alertMessage": "CRITICAL ALERT: ..." }
+  "source": "demo-file.log",
+  "entries": [
+    {
+      "message": "Receiving block blk_-1608999687919862906 src: /10.250.19.102:54106 dest: /10.250.19.102:50010"
+    },
+    {
+      "message": "PacketResponder 1 for block blk_-1608999687919862906 terminating"
+    }
+  ]
 }
 ```
 
----
-
-### GET /api/logs — List all logs
+### ML status
 
 ```http
-GET http://localhost:5000/api/logs
+GET /api/logs/ml-status
 ```
 
----
-
-### GET /api/incidents — List all incidents
+### Stored records
 
 ```http
-GET http://localhost:5000/api/incidents
+GET /api/logs
+GET /api/incidents
 ```
 
----
+### Live external ingestion
 
-## Risk Classification Rules
-
-| Keyword in message | Risk Level |
-|--------------------|------------|
-| `CRITICAL`         | CRITICAL   |
-| `ERROR`            | HIGH       |
-| `FAIL`             | MEDIUM     |
-| `WARNING`          | LOW        |
-| (none matched)     | INFO (no incident created) |
-
-Only **CRITICAL**, **ERROR**, and **FAIL** create incident records.
-Only **CRITICAL** incidents additionally generate an alert record.
-
----
-
-## Demo Walkthrough
-
-1. Open **http://localhost:3000** in your browser.
-2. On the **Submit Log** tab, paste one of these messages and click **Submit Log**:
-   - `CRITICAL: Memory usage exceeded 95% — system unstable`
-   - `ERROR: Database connection timed out after 30s`
-   - `FAIL: Authentication service is unavailable`
-   - `INFO: Scheduled backup completed successfully`
-3. Observe the response — risk level, incident ID, and alert (for CRITICAL).
-4. Switch to the **Incidents** tab to see the live incident table.
-5. Switch to the **All Logs** tab to see every submitted log.
-6. The **Stat cards** at the top update automatically after each submission.
-
----
-
-## Architecture Notes (UML flows)
-
-```
-[LogUpload Form]
-      │  POST /api/logs { message, source }
-      ▼
-[logController.ingestLog]
-      │
-      ├─► logParser.parseLog()         — trim & normalize text
-      ├─► logModel.createLog()         — INSERT into logs table
-      ├─► incidentDetector.detectIncident()
-      │       ├─ logAnalyzer.analyzeLog()   — keyword scan
-      │       └─ riskClassifier.classifyRisk() — severity assignment
-      ├─► incidentModel.createIncident()   — INSERT into incidents table
-      └─► alertGenerator.generateAlert()   — INSERT into alerts (CRITICAL only)
+```http
+GET  /api/live/status
+GET  /api/live/events
+POST /api/live/start
+POST /api/live/stop
 ```
 
----
+`/api/live/events` is an SSE endpoint. It emits `live:status`, `live:log`,
+`live:error`, and `live:heartbeat` events.
+
+Start from a custom public URL:
+
+```http
+POST /api/live/start
+Content-Type: application/json
+
+{
+  "sourceType": "public-url",
+  "sourceName": "wikipedia-recent-changes",
+  "sourceUrl": "https://en.wikipedia.org/w/api.php?action=query&list=recentchanges&rcprop=title%7Ctimestamp%7Cuser%7Ccomment%7Cflags%7Cids%7Csizes%7Cloginfo&rclimit=30&format=json"
+}
+```
+
+Public URLs to try:
+
+- Wikipedia recent changes: `https://en.wikipedia.org/w/api.php?action=query&list=recentchanges&rcprop=title%7Ctimestamp%7Cuser%7Ccomment%7Cflags%7Cids%7Csizes%7Cloginfo&rclimit=30&format=json`
+- Wikidata recent changes: `https://www.wikidata.org/w/api.php?action=query&list=recentchanges&rcprop=title%7Ctimestamp%7Cuser%7Ccomment%7Cflags%7Cids%7Csizes%7Cloginfo&rclimit=30&format=json`
+- MediaWiki recent changes: `https://www.mediawiki.org/w/api.php?action=query&list=recentchanges&rcprop=title%7Ctimestamp%7Cuser%7Ccomment%7Cflags%7Cids%7Csizes%7Cloginfo&rclimit=30&format=json`
+- Reddit r/sysadmin new posts: `https://www.reddit.com/r/sysadmin/new.json?limit=30&raw_json=1`
+- StackOverflow newest questions: `https://api.stackexchange.com/2.3/questions?order=desc&sort=creation&site=stackoverflow&pagesize=30`
+- USGS earthquakes, past hour: `https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson`
+- Reddit status incidents: `https://www.redditstatus.com/api/v2/incidents.json`
+- GitHub public events: `https://api.github.com/events`
+
+## ML Notes
+
+- HDFS labels are block-level.
+- The model predicts `Normal` vs `Anomaly`.
+- The app maps anomaly probability to `LOW`, `MEDIUM`, `HIGH`, and `CRITICAL`.
+- Incidents are created when the binary prediction is `Anomaly`.
+- `CRITICAL` incidents generate alerts.
+
+## Demo Flow
+
+1. Start MySQL, backend, ML service, and frontend.
+2. Open `http://localhost:3000`.
+3. On the submit tab, choose an HDFS sample and submit it.
+4. Show the returned anomaly probability, risk score, and top features.
+5. Open the live tab, select a public source, and click Extract live.
+6. Watch public events arrive one-by-one as classified logs.
+7. Upload a small `.log` file and show the file summary table.
+8. Open the incidents tab and log history tab to show persisted results.
 
 ## Troubleshooting
 
-| Problem | Fix |
-|---------|-----|
-| `ER_ACCESS_DENIED_ERROR` | Check `DB_USER` / `DB_PASSWORD` in `.env` |
-| `ER_BAD_DB_ERROR: Unknown database 'alars_db'` | Run `database/schema.sql` first |
-| Frontend shows "Could not reach the backend" | Make sure the backend is running on port 5000 |
-| Port 3000 already in use | React will prompt to use a different port — press **Y** |
-| `nodemon: command not found` | Run `npm install` again inside the `backend/` folder |
+- If the frontend says backend offline, check port `5000`.
+- If the dashboard says `ML offline, fallback mode`, start `ml_service/server.py`.
+- If MySQL fails, confirm `.env` values and run `database/schema.sql`.
+- The file upload endpoint accepts up to `200` non-empty lines per request for demo stability.

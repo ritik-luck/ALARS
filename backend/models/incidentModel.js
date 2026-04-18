@@ -1,9 +1,9 @@
 const db = require('../config/db');
 
-async function createIncident(logId, riskLevel) {
+async function createIncident(logId, message, riskLevel) {
   const [result] = await db.execute(
-    'INSERT INTO incidents (log_id, risk_level, status) VALUES (?, ?, ?)',
-    [logId, riskLevel, 'open']
+    'INSERT INTO incidents (log_id, message, risk_level, status) VALUES (?, ?, ?, ?)',
+    [logId, message, riskLevel, 'open']
   );
   return result.insertId;
 }

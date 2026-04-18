@@ -28,12 +28,17 @@ CREATE TABLE IF NOT EXISTS logs (
 
 -- ── Incidents ────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS incidents (
-  id         INT         AUTO_INCREMENT PRIMARY KEY,
-  log_id     INT         NOT NULL,
-  risk_level VARCHAR(50) NOT NULL,            -- CRITICAL | HIGH | MEDIUM | LOW
-  status     VARCHAR(50) NOT NULL DEFAULT 'open',
-  created_at DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_incident_log FOREIGN KEY (log_id) REFERENCES logs (id)
+  id                 INT         AUTO_INCREMENT PRIMARY KEY,
+  log_id             INT         NOT NULL,
+  risk_level         VARCHAR(50) NOT NULL,            -- CRITICAL | HIGH | MEDIUM | LOW
+  status             VARCHAR(50) NOT NULL DEFAULT 'open', -- open | in_progress | resolved
+  assignee_id        INT         NULL,
+  resolution_notes   TEXT        NULL,
+  mitigation_actions TEXT        NULL,
+  created_at         DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at         DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_incident_log FOREIGN KEY (log_id) REFERENCES logs (id),
+  CONSTRAINT fk_incident_assignee FOREIGN KEY (assignee_id) REFERENCES users (id)
 );
 
 -- ── Alerts ───────────────────────────────────────────────────
@@ -43,6 +48,16 @@ CREATE TABLE IF NOT EXISTS alerts (
   alert_message TEXT     NOT NULL,
   created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_alert_incident FOREIGN KEY (incident_id) REFERENCES incidents (id)
+);
+
+-- ── Rules ────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS rules (
+  id             INT          AUTO_INCREMENT PRIMARY KEY,
+  rule_name      VARCHAR(100) NOT NULL,
+  description    TEXT         NOT NULL,
+  severity_level VARCHAR(50)  NOT NULL,
+  is_active      BOOLEAN      NOT NULL DEFAULT TRUE,
+  created_at     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ── Sample seed data (optional demo rows) ────────────────────

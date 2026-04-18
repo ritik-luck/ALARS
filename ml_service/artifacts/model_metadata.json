@@ -1,0 +1,93 @@
+{
+  "model_name": "xgboost",
+  "dataset": "HDFS_100k (LogHub Benchmark)",
+  "label_granularity": "block_level",
+  "accuracy": 0.9785894206549118,
+  "precision": 0.967741935483871,
+  "recall": 0.47619047619047616,
+  "f1_score": 0.6382978723404256,
+  "balanced_accuracy": 0.7377673692427791,
+  "average_precision": 0.5299762718310869,
+  "roc_auc": 0.749768410096279,
+  "binary_decision_threshold": 0.949999988079071,
+  "risk_thresholds": {
+    "LOW": 0.3,
+    "MEDIUM": 0.5,
+    "HIGH": 0.7
+  },
+  "classes": {
+    "binary": [
+      "Normal",
+      "Anomaly"
+    ],
+    "risk_levels": [
+      "LOW",
+      "MEDIUM",
+      "HIGH",
+      "CRITICAL"
+    ]
+  },
+  "dataset_info": {
+    "total_samples": 7940,
+    "normal_count": 7627,
+    "anomaly_count": 313,
+    "unique_blocks": 7940,
+    "avg_text_length": 3671,
+    "max_text_length": 59808,
+    "min_text_length": 661,
+    "avg_lines_per_block": 13.2,
+    "max_lines_per_block": 249,
+    "avg_unique_events": 5.16,
+    "avg_unique_components": 3.18,
+    "label_granularity": "block_level",
+    "structured_log_lines": 104815,
+    "structured_unique_blocks": 7940,
+    "dropped_lines_without_block_id": 0,
+    "raw_label_count": 575061,
+    "raw_normal_count": 558223,
+    "raw_anomaly_count": 16838,
+    "matched_blocks": 7940,
+    "matched_normal_count": 7627,
+    "matched_anomaly_count": 313,
+    "unmatched_labeled_blocks": 567121,
+    "document_fields": [
+      "Content",
+      "EventTemplate",
+      "EventId",
+      "Component",
+      "Level"
+    ]
+  },
+  "train_samples": 5081,
+  "validation_samples": 1271,
+  "training_samples": 6352,
+  "test_samples": 1588,
+  "feature_count": 620,
+  "feature_config": {
+    "max_features": 10000,
+    "ngram_range": [
+      1,
+      2
+    ],
+    "min_df": 1,
+    "max_df": 1.0,
+    "sublinear_tf": true,
+    "token_pattern": "(?u)\\b[a-z0-9_][a-z0-9_]+\\b",
+    "actual_feature_count": 620,
+    "tfidf_feature_count": 612,
+    "handcrafted_feature_count": 8
+  },
+  "selection_metric": "validation_f1_score",
+  "all_models_evaluated": {
+    "xgboost": {
+      "validation_f1_score": 0.5915492957746479,
+      "validation_average_precision": 0.4675928316915116,
+      "validation_accuracy": 0.977183320220299
+    },
+    "random_forest": {
+      "validation_f1_score": 0.5915492957746479,
+      "validation_average_precision": 0.454964963553143,
+      "validation_accuracy": 0.977183320220299
+    }
+  }
+}
