@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:5000/api';
+export const API_BASE = 'http://localhost:5002/api';
 const LIVE_EVENTS_URL = `${API_BASE}/live/events`;
 
 export const submitLog = (message, source = 'manual') =>

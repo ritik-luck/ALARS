@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
+import { API_BASE } from '../api';
 
 const AdminPanel = () => {
   const [users, setUsers] = useState([]);
@@ -18,35 +19,35 @@ const AdminPanel = () => {
   }, [isRulesView]);
 
   const fetchUsers = async () => {
-    const res = await axios.get('http://localhost:5000/api/users');
+    const res = await axios.get(`${API_BASE}/users`);
     setUsers(res.data);
   };
 
   const fetchRules = async () => {
-    const res = await axios.get('http://localhost:5000/api/rules');
+    const res = await axios.get(`${API_BASE}/rules`);
     setRules(res.data);
   };
 
   const changeUserRole = async (id, role) => {
-    await axios.put(`http://localhost:5000/api/users/${id}/role`, { role });
+    await axios.put(`${API_BASE}/users/${id}/role`, { role });
     fetchUsers();
   };
 
   const addRule = async (e) => {
     e.preventDefault();
-    await axios.post('http://localhost:5000/api/rules', newRule);
+    await axios.post(`${API_BASE}/rules`, newRule);
     setNewRule({ rule_name: '', description: '', severity_level: 'MEDIUM' });
     fetchRules();
   };
 
   const toggleRule = async (id, currentStatus) => {
-    await axios.put(`http://localhost:5000/api/rules/${id}/toggle`, { is_active: !currentStatus });
+    await axios.put(`${API_BASE}/rules/${id}/toggle`, { is_active: !currentStatus });
     fetchRules();
   };
 
   const deleteRule = async (id) => {
     if (window.confirm('Delete this rule?')) {
-      await axios.delete(`http://localhost:5000/api/rules/${id}`);
+      await axios.delete(`${API_BASE}/rules/${id}`);
       fetchRules();
     }
   };

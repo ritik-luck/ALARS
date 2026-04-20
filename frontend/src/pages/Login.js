@@ -55,9 +55,6 @@ const Login = () => {
             Sign In
           </button>
         </form>
-        <div style={{ marginTop: '2rem', textAlign: 'center', color: 'var(--muted)', fontSize: '0.875rem' }}>
-          Test Accounts: admin/admin123, analyst/analyst123
-        </div>
       </div>
     </div>
   );

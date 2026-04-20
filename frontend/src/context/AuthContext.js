@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE } from '../api';
 
 const AuthContext = createContext();
 
@@ -22,7 +23,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (username, password) => {
-    const response = await axios.post('http://localhost:5000/api/auth/login', { username, password });
+    const response = await axios.post(`${API_BASE}/auth/login`, { username, password });
     const { token, user } = response.data;
     
     localStorage.setItem('alars_token', token);

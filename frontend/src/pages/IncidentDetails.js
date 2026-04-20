@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ShieldAlert, User, CheckCircle, Clock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE } from '../api';
 
 const MitigationOptions = {
   CRITICAL: [
@@ -44,7 +45,7 @@ const IncidentDetails = () => {
   }, [id]);
 
   const fetchIncident = async () => {
-    const res = await axios.get(`http://localhost:5000/api/incidents/${id}`);
+    const res = await axios.get(`${API_BASE}/incidents/${id}`);
     setIncident(res.data);
     setAssigneeId(res.data.assignee_id || '');
     setResolutionNotes(res.data.resolution_notes || '');
@@ -52,17 +53,17 @@ const IncidentDetails = () => {
   };
 
   const fetchUsers = async () => {
-    const res = await axios.get('http://localhost:5000/api/users');
+    const res = await axios.get(`${API_BASE}/users`);
     setUsers(res.data.filter(u => u.role !== 'viewer'));
   };
 
   const handleAssign = async () => {
-    await axios.put(`http://localhost:5000/api/incidents/${id}/assign`, { assignee_id: assigneeId });
+    await axios.put(`${API_BASE}/incidents/${id}/assign`, { assignee_id: assigneeId });
     fetchIncident();
   };
 
   const handleStatus = async (status) => {
-    await axios.put(`http://localhost:5000/api/incidents/${id}/status`, { status });
+    await axios.put(`${API_BASE}/incidents/${id}/status`, { status });
     fetchIncident();
   };
 
@@ -71,7 +72,7 @@ const IncidentDetails = () => {
       alert('Resolution notes and mitigation actions are required.');
       return;
     }
-    await axios.put(`http://localhost:5000/api/incidents/${id}/resolve`, {
+    await axios.put(`${API_BASE}/incidents/${id}/resolve`, {
       resolution_notes: resolutionNotes,
       mitigation_actions: selectedMitigation
     });

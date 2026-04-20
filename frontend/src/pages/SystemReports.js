@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { Activity, AlertTriangle, FileWarning, ShieldAlert } from 'lucide-react';
+import { API_BASE } from '../api';
 
 const SystemReports = () => {
   const [stats, setStats] = useState(null);
@@ -9,7 +10,7 @@ const SystemReports = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/reports/stats');
+        const res = await axios.get(`${API_BASE}/reports/stats`);
         setStats(res.data);
       } catch (err) {
         console.error(err);
