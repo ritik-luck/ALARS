@@ -242,29 +242,29 @@ describe('White Box — DAL Input Validation Guards', () => {
 
   // ── incidentDAL.createIncident guard clauses ───────────────
   test('WB-DAL-04: createIncident throws when logId is missing', async () => {
-    await expect(createIncident(null, 'HIGH'))
-      .rejects.toThrow('logId and riskLevel are required.');
+    await expect(createIncident(null, 'Disk failure detected', 'HIGH'))
+      .rejects.toThrow('logId, message and riskLevel are required.');
   });
 
   test('WB-DAL-05: createIncident throws when riskLevel is missing', async () => {
-    await expect(createIncident(1, null))
-      .rejects.toThrow('logId and riskLevel are required.');
+    await expect(createIncident(1, 'Disk failure detected', null))
+      .rejects.toThrow('logId, message and riskLevel are required.');
   });
 
   test('WB-DAL-06: createIncident throws for invalid riskLevel', async () => {
-    await expect(createIncident(1, 'INVALID'))
+    await expect(createIncident(1, 'Disk failure detected', 'INVALID'))
       .rejects.toThrow('Invalid riskLevel "INVALID"');
   });
 
   // ── alertDAL.createAlert guard clauses ─────────────────────
   test('WB-DAL-07: createAlert throws when incidentId is missing', async () => {
     await expect(createAlert(null, 'alert text'))
-      .rejects.toThrow('incidentId and alertMessage are required.');
+      .rejects.toThrow('An alert must include a target incident or log and an alertMessage.');
   });
 
   test('WB-DAL-08: createAlert throws when alertMessage is missing', async () => {
     await expect(createAlert(1, null))
-      .rejects.toThrow('incidentId and alertMessage are required.');
+      .rejects.toThrow('An alert must include a target incident or log and an alertMessage.');
   });
 
   // ── userDAL.createUser guard clauses ───────────────────────

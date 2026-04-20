@@ -243,11 +243,11 @@ describe('Black Box — DAL Input Validation', () => {
   });
 
   test('BB-DAL-03: creating an incident without logId fails', async () => {
-    await expect(createIncident(null, 'HIGH')).rejects.toThrow();
+    await expect(createIncident(null, 'Outage detected', 'HIGH')).rejects.toThrow();
   });
 
   test('BB-DAL-04: creating an incident with bad risk level fails', async () => {
-    await expect(createIncident(1, 'EXTREME')).rejects.toThrow();
+    await expect(createIncident(1, 'Outage detected', 'EXTREME')).rejects.toThrow();
   });
 
   test('BB-DAL-05: creating an alert without incidentId fails', async () => {
