@@ -1,6 +1,5 @@
-const db = require('../config/db');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { userDAL } = require('../dal');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-alars-key';
 
@@ -12,15 +11,12 @@ async function login(req, res) {
   }
 
   try {
-    const [users] = await db.execute('SELECT * FROM users WHERE username = ?', [username]);
-    if (users.length === 0) {
+    const user = await userDAL.getUserByUsername(username);
+    if (!user) {
       return res.status(400).json({ error: 'Invalid username or password' });
     }
 
-    const user = users[0];
-    const validPassword = await bcrypt.compare(password, user.password);
-    
-    if (!validPassword) {
+    if (password !== user.password) {
       return res.status(400).json({ error: 'Invalid username or password' });
     }
 

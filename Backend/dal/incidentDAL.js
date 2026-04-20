@@ -36,7 +36,17 @@ async function createIncident(logId, message, riskLevel, status = 'open') {
  * @returns {Promise<object|null>}
  */
 async function getIncidentById(id) {
-  const rows = await query('SELECT * FROM incidents WHERE id = ?', [id]);
+  const rows = await query(`
+    SELECT
+      i.*,
+      l.source AS log_source,
+      l.created_at AS log_timestamp,
+      u.username AS assignee_name
+    FROM incidents i
+    JOIN logs l ON i.log_id = l.id
+    LEFT JOIN users u ON i.assignee_id = u.id
+    WHERE i.id = ?
+  `, [id]);
   return rows.length ? rows[0] : null;
 }
 
@@ -49,8 +59,13 @@ async function getAllIncidents() {
     SELECT
       i.id,
       i.log_id,
+      i.message,
       i.risk_level,
       i.status,
+      i.assignee_id,
+      i.resolution_notes,
+      i.mitigation_actions,
+      i.updated_at,
       i.created_at,
       l.message  AS log_message,
       l.source
@@ -84,6 +99,11 @@ async function getIncidentsByStatus(status) {
   );
 }
 
+async function getIncidentByLogId(logId) {
+  const rows = await query('SELECT * FROM incidents WHERE log_id = ? LIMIT 1', [logId]);
+  return rows.length ? rows[0] : null;
+}
+
 // ── READ (count) ─────────────────────────────────────────────
 /**
  * @returns {Promise<number>}
@@ -101,9 +121,31 @@ async function getIncidentCount() {
  * @returns {Promise<boolean>}
  */
 async function updateIncidentStatus(id, newStatus) {
+  const validStatuses = ['open', 'in_progress', 'resolved'];
+  if (!validStatuses.includes(newStatus)) {
+    throw new Error(`Invalid incident status "${newStatus}".`);
+  }
   const result = await query(
     'UPDATE incidents SET status = ? WHERE id = ?',
     [newStatus, id]
+  );
+  return result.affectedRows > 0;
+}
+
+async function assignIncident(id, assigneeId) {
+  const result = await query(
+    'UPDATE incidents SET assignee_id = ?, status = ? WHERE id = ?',
+    [assigneeId, 'in_progress', id]
+  );
+  return result.affectedRows > 0;
+}
+
+async function resolveIncident(id, resolutionNotes = null, mitigationActions = null) {
+  const result = await query(
+    `UPDATE incidents
+     SET status = ?, resolution_notes = ?, mitigation_actions = ?
+     WHERE id = ?`,
+    ['resolved', resolutionNotes, mitigationActions, id]
   );
   return result.affectedRows > 0;
 }
@@ -124,7 +166,10 @@ module.exports = {
   getAllIncidents,
   getIncidentsByRiskLevel,
   getIncidentsByStatus,
+  getIncidentByLogId,
   getIncidentCount,
+  assignIncident,
   updateIncidentStatus,
+  resolveIncident,
   deleteIncident,
 };

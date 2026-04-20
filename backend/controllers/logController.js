@@ -1,5 +1,6 @@
 const { getMlHealth } = require('../services/mlRiskService');
 const { getAllLogs } = require('../models/logModel');
+const { alertDAL, logDAL } = require('../dal');
 const {
   processIncomingLog,
   summarizeBatch,
@@ -98,12 +99,9 @@ async function notifyLog(req, res) {
   try {
     const { id } = req.params;
     const { risk_level, message } = req.body;
-    
-    const db = require('../config/db');
-    
-    // Verify log exists
-    const [logs] = await db.execute('SELECT id, message FROM logs WHERE id = ?', [id]);
-    if (logs.length === 0) {
+
+    const log = await logDAL.getLogById(id);
+    if (!log) {
       return res.status(404).json({ 
         success: false, 
         error: `Log ID #${id} not found.` 
@@ -113,11 +111,7 @@ async function notifyLog(req, res) {
     const finalRisk = risk_level || 'INFO';
     const finalMessage = message || `Manual alert for log entry #${id}`;
 
-    // Create alert
-    await db.execute(
-      'INSERT INTO alerts (log_id, alert_type, alert_message, is_read) VALUES (?, ?, ?, FALSE)',
-      [id, finalRisk, finalMessage]
-    );
+    await alertDAL.createAlert(null, finalMessage, { logId: log.id, alertType: finalRisk });
 
     return res.status(201).json({ 
       success: true, 

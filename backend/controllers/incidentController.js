@@ -1,5 +1,12 @@
-const db = require('../config/db');
-const { getAllIncidents } = require('../models/incidentModel');
+const {
+  getAllIncidents,
+  getIncidentById: fetchIncidentById,
+  assignIncident: assignIncidentToUser,
+  updateIncidentStatus: persistIncidentStatus,
+  resolveIncident: persistResolvedIncident,
+  createIncident,
+} = require('../models/incidentModel');
+const { incidentDAL, logDAL } = require('../dal');
 
 async function getIncidents(req, res) {
   try {
@@ -14,21 +21,10 @@ async function getIncidents(req, res) {
 async function getIncidentById(req, res) {
   try {
     const { id } = req.params;
-    const [rows] = await db.execute(`
-      SELECT 
-        i.*, 
-        l.message as log_message,
-        l.source as log_source,
-        l.created_at as log_timestamp,
-        u.username as assignee_name
-      FROM incidents i
-      JOIN logs l ON i.log_id = l.id
-      LEFT JOIN users u ON i.assignee_id = u.id
-      WHERE i.id = ?
-    `, [id]);
-    
-    if (rows.length === 0) return res.status(404).json({ error: 'Incident not found' });
-    res.json(rows[0]);
+    const incident = await fetchIncidentById(id);
+
+    if (!incident) return res.status(404).json({ error: 'Incident not found' });
+    res.json(incident);
   } catch (err) {
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -38,8 +34,11 @@ async function assignIncident(req, res) {
   try {
     const { id } = req.params;
     const { assignee_id } = req.body; // user_id
-    
-    await db.execute('UPDATE incidents SET assignee_id = ?, status = "in_progress" WHERE id = ?', [assignee_id, id]);
+
+    const updated = await assignIncidentToUser(id, assignee_id);
+    if (!updated) {
+      return res.status(404).json({ error: 'Incident not found' });
+    }
     res.json({ success: true, message: 'Incident assigned' });
   } catch (err) {
     res.status(500).json({ error: 'Internal server error' });
@@ -54,8 +53,11 @@ async function updateIncidentStatus(req, res) {
     if (!['open', 'in_progress', 'resolved'].includes(status)) {
       return res.status(400).json({ error: 'Invalid status' });
     }
-    
-    await db.execute('UPDATE incidents SET status = ? WHERE id = ?', [status, id]);
+
+    const updated = await persistIncidentStatus(id, status);
+    if (!updated) {
+      return res.status(404).json({ error: 'Incident not found' });
+    }
     res.json({ success: true, message: 'Status updated' });
   } catch (err) {
     res.status(500).json({ error: 'Internal server error' });
@@ -66,11 +68,11 @@ async function resolveIncident(req, res) {
   try {
     const { id } = req.params;
     const { resolution_notes, mitigation_actions } = req.body;
-    
-    await db.execute(
-      'UPDATE incidents SET status = "resolved", resolution_notes = ?, mitigation_actions = ? WHERE id = ?',
-      [resolution_notes, mitigation_actions, id]
-    );
+
+    const updated = await persistResolvedIncident(id, resolution_notes, mitigation_actions);
+    if (!updated) {
+      return res.status(404).json({ error: 'Incident not found' });
+    }
     res.json({ success: true, message: 'Incident resolved' });
   } catch (err) {
     res.status(500).json({ error: 'Internal server error' });
@@ -80,37 +82,31 @@ async function resolveIncident(req, res) {
 async function promoteLogToIncident(req, res) {
   try {
     const { log_id, risk_level } = req.body;
-    
+
     if (!log_id) return res.status(400).json({ error: 'log_id is required' });
 
-    // Prevent duplicate promotions
-    const [existing] = await db.execute('SELECT id FROM incidents WHERE log_id = ?', [log_id]);
-    if (existing.length > 0) {
-      return res.status(409).json({ error: 'Log has already been promoted to an incident', incident_id: existing[0].id });
+    const existing = await incidentDAL.getIncidentByLogId(log_id);
+    if (existing) {
+      return res.status(409).json({ error: 'Log has already been promoted to an incident', incident_id: existing.id });
     }
 
-    // Verify log exists and get message
-    const [logs] = await db.execute('SELECT id, message FROM logs WHERE id = ?', [log_id]);
-    if (logs.length === 0) {
+    const log = await logDAL.getLogById(log_id);
+    if (!log) {
       return res.status(404).json({ 
         success: false, 
         error: `Log entry #${log_id} not found. Connection may be stale.` 
       });
     }
 
-    const logMessage = logs[0].message;
+    const logMessage = log.message;
     const finalRisk = risk_level || 'MEDIUM';
 
-    // Insert into incidents
-    const [result] = await db.execute(
-      'INSERT INTO incidents (log_id, message, risk_level, status) VALUES (?, ?, ?, "open")',
-      [log_id, logMessage, finalRisk]
-    );
+    const incidentId = await createIncident(log_id, logMessage, finalRisk);
 
     return res.status(201).json({ 
       success: true, 
       message: 'Log successfully promoted to incident',
-      incident_id: result.insertId 
+      incident_id: incidentId 
     });
   } catch (err) {
     console.error('promoteLogToIncident error:', err);

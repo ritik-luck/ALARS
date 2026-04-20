@@ -1,28 +1,34 @@
-const db = require('../config/db');
+const { incidentDAL } = require('../dal');
 
 async function createIncident(logId, message, riskLevel) {
-  const [result] = await db.execute(
-    'INSERT INTO incidents (log_id, message, risk_level, status) VALUES (?, ?, ?, ?)',
-    [logId, message, riskLevel, 'open']
-  );
-  return result.insertId;
+  return incidentDAL.createIncident(logId, message, riskLevel);
 }
 
 async function getAllIncidents() {
-  const [rows] = await db.execute(`
-    SELECT
-      i.id,
-      i.log_id,
-      i.risk_level,
-      i.status,
-      i.created_at,
-      l.message AS log_message,
-      l.source
-    FROM incidents i
-    JOIN logs l ON i.log_id = l.id
-    ORDER BY i.created_at DESC
-  `);
-  return rows;
+  return incidentDAL.getAllIncidents();
 }
 
-module.exports = { createIncident, getAllIncidents };
+async function getIncidentById(id) {
+  return incidentDAL.getIncidentById(id);
+}
+
+async function assignIncident(id, assigneeId) {
+  return incidentDAL.assignIncident(id, assigneeId);
+}
+
+async function updateIncidentStatus(id, status) {
+  return incidentDAL.updateIncidentStatus(id, status);
+}
+
+async function resolveIncident(id, resolutionNotes, mitigationActions) {
+  return incidentDAL.resolveIncident(id, resolutionNotes, mitigationActions);
+}
+
+module.exports = {
+  createIncident,
+  getAllIncidents,
+  getIncidentById,
+  assignIncident,
+  updateIncidentStatus,
+  resolveIncident,
+};

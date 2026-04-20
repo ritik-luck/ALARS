@@ -15,12 +15,19 @@ const { query } = require('./connection');
  * @returns {Promise<number>} insertId
  */
 async function createLog(message, source = 'manual', riskLevel = 'INFO', confidence = 0) {
-  if (!message || !message.trim()) {
+  if (!message || !String(message).trim()) {
     throw new Error('Log message cannot be empty.');
   }
+  const normalizedRiskLevel = String(riskLevel || 'INFO').trim().toUpperCase();
+  const normalizedConfidence = Number(confidence);
+
+  if (!Number.isFinite(normalizedConfidence)) {
+    throw new Error('Log confidence must be a valid number.');
+  }
+
   const result = await query(
     'INSERT INTO logs (message, source, risk_level, confidence) VALUES (?, ?, ?, ?)',
-    [message, source, riskLevel, confidence]
+    [String(message).trim(), source || 'manual', normalizedRiskLevel, normalizedConfidence]
   );
   return result.insertId;
 }
@@ -65,6 +72,18 @@ async function getLogCount() {
   return rows[0].total;
 }
 
+async function getLogsByRiskLevel(riskLevel) {
+  return query(
+    'SELECT *, created_at as timestamp FROM logs WHERE risk_level = ? ORDER BY created_at DESC',
+    [riskLevel]
+  );
+}
+
+async function markLogSource(id, source) {
+  const result = await query('UPDATE logs SET source = ? WHERE id = ?', [source, id]);
+  return result.affectedRows > 0;
+}
+
 // ── DELETE ───────────────────────────────────────────────────
 /**
  * Delete a single log by primary key.
@@ -81,6 +100,8 @@ module.exports = {
   getLogById,
   getAllLogs,
   getLogsBySource,
+  getLogsByRiskLevel,
   getLogCount,
+  markLogSource,
   deleteLog,
 };

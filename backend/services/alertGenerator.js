@@ -4,7 +4,7 @@
  * is detected.
  */
 
-const db = require('../config/db');
+const { alertDAL } = require('../dal');
 
 async function sendNotification(incidentId, level, message) {
   // Mock external Notification Service (e.g. Email/Slack webhook)
@@ -27,12 +27,12 @@ async function generateAlert(incidentId, logId, logMessage, riskLevel) {
     alertMessage = `MEDIUM RISK: Timeouts or repeated retrieval failures.`;
   }
 
-  const [result] = await db.execute(
-    'INSERT INTO alerts (incident_id, log_id, alert_type, alert_message) VALUES (?, ?, ?, ?)',
-    [incidentId, logId, riskLevel, alertMessage]
-  );
+  const alertId = await alertDAL.createAlert(incidentId, alertMessage, {
+    logId,
+    alertType: riskLevel,
+  });
 
-  return { id: result.insertId, alertMessage };
+  return { id: alertId, alertMessage };
 }
 
 module.exports = { generateAlert };
