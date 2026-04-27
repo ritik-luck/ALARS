@@ -36,12 +36,12 @@ describe('White Box — logParser.parseLog()', () => {
 
   // ── Statement Coverage: verify the basic path executes ──────
   test('WB-LP-01: trims leading and trailing whitespace', () => {
-    const result = parseLog('  hello world  ');
+    const result = parseLog('   hello world   ');
     expect(result.message).toBe('hello world');
   });
 
   test('WB-LP-02: collapses multiple internal spaces into one', () => {
-    const result = parseLog('disk    failure    detected');
+    const result = parseLog('disk     failure     detected');
     expect(result.message).toBe('disk failure detected');
   });
 
